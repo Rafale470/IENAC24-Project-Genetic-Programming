@@ -11,6 +11,7 @@ OPERATORS_PROBA = [item[1] for item in OPERATORS.values()]
 TERMINALS = {"x": (sp.Symbol("x"), 0.25), "cst":("cst", 0.25)}
 TERMINALS_LIST = [item[0] for item in TERMINALS.values()]
 TERMINALS_PROBA = [item[1] for item in TERMINALS.values()]
+CST_RANGE = [-5, 5]
 
 class Tree(object):
     def __init__ (self, name):
@@ -51,7 +52,7 @@ class Tree(object):
         for i in range(2**(depth-1)):
             random.seed(seed)
             elt = random.choices(TERMINALS_LIST, weights=TERMINALS_PROBA, k=1)[0]
-            self.content.append(round(random.uniform(-5,5),1) if elt == "cst" else elt)
+            self.content.append(round(random.uniform(CST_RANGE[0, CST_RANGE[1]),1) if elt == "cst" else elt)
             seed = random.randint(0, 9999)
         self.depth = depth
     
@@ -64,12 +65,12 @@ class Tree(object):
         for i in range(2**(depth)-2**(depth-1)-1):
             random.seed(seed)
             elt = random.choices(OPERATORS_LIST+TERMINALS_LIST, weights=OPERATORS_PROBA+TERMINALS_PROBA, k=1)[0]
-            self.content.append(round(random.uniform(-5,5),1) if elt == "cst" else elt)
+            self.content.append(round(random.uniform(CST_RANGE[0], CST_RANGE[1]),1) if elt == "cst" else elt)
             seed = random.randint(0, 9999)
         for i in range(2**(depth-1)):
             random.seed(seed)
             elt = random.choices(TERMINALS_LIST, weights=TERMINALS_PROBA, k=1)[0]
-            self.content.append(round(random.uniform(-5,5),1) if elt == "cst" else elt)
+            self.content.append(round(random.uniform(CST_RANGE[0], CST_RANGE[1]),1) if elt == "cst" else elt)
             seed = random.randint(0, 9999)
         for i in range(2**(depth)-2**(depth-1)-1):
             if not self.content[i] in OPERATORS_LIST :
