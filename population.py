@@ -20,6 +20,7 @@ class Tree(object):
         self.content = []
         self.depth = 0
         self.gen_seed = None
+        self.gen = 0
     
     def __repr__(self):
         def build_expression(i=0):
@@ -33,6 +34,9 @@ class Tree(object):
             elif isinstance(self.content[i], sp.Symbol):
                 return str(self.content[i])
         return build_expression()
+    
+    def __eq__ (self, other):
+        return self.content == other.content
     
     def get_operator_symbol(self, operator_func):
         for op_symbol, (op_func, _) in OPERATORS.items():
@@ -56,6 +60,7 @@ class Tree(object):
             self.content.append(round(random.uniform(CST_RANGE[0], CST_RANGE[1]),1) if elt == "cst" else elt)
             seed = random.randint(0, SEED_RANGE)
         self.depth = depth
+        self.gen = 1
     
     def generate_tree_growth(self, depth, seed=None):
         if seed == None :
@@ -78,6 +83,7 @@ class Tree(object):
                 self.content[(i+1)*2-1] = None
                 self.content[(i+1)*2] = None
         self.depth = depth
+        self.gen = 1
 
 class Pop(object):
     def __init__(self, name):
