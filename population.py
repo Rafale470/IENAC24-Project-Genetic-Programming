@@ -12,6 +12,7 @@ TERMINALS = {"x": (sp.Symbol("x"), 0.25), "cst":("cst", 0.25)}
 TERMINALS_LIST = [item[0] for item in TERMINALS.values()]
 TERMINALS_PROBA = [item[1] for item in TERMINALS.values()]
 CST_RANGE = [-5, 5]
+SEED_RANGE = 9999
 
 class Tree(object):
     def __init__ (self, name):
@@ -21,16 +22,16 @@ class Tree(object):
         self.gen_seed = None
     
     def __repr__(self):
-        def build_expression(index=0):
-            if self.content[index] in OPERATORS_LIST:
-                op = self.content[index]
-                left = build_expression(index + 1)
-                right = build_expression(index + 2)
+        def build_expression(i=0):
+            if self.content[i] in OPERATORS_LIST:
+                op = self.content[i]
+                left = build_expression((i+1)*2-1)
+                right = build_expression((i+1)*2)
                 return f"({left} {self.get_operator_symbol(op)} {right})"
-            elif isinstance(self.content[index], (int, float)):
-                return str(self.content[index])
-            elif isinstance(self.content[index], sp.Symbol):
-                return str(self.content[index])
+            elif isinstance(self.content[i], (int, float)):
+                return str(self.content[i])
+            elif isinstance(self.content[i], sp.Symbol):
+                return str(self.content[i])
         return build_expression()
     
     def get_operator_symbol(self, operator_func):
@@ -41,24 +42,24 @@ class Tree(object):
     
     def generate_tree_full(self, depth, seed=None):
         if seed == None :
-            self.gen_seed=random.randint(0, 9999)
+            self.gen_seed=random.randint(0, SEED_RANGE)
         else :
             self.gen_seed = seed
         seed = self.gen_seed
         for i in range(2**(depth)-2**(depth-1)-1):
             random.seed(seed)
             self.content.append(random.choices(OPERATORS_LIST, weights=OPERATORS_PROBA, k=1)[0])
-            seed = random.randint(0, 9999)
+            seed = random.randint(0, SEED_RANGE)
         for i in range(2**(depth-1)):
             random.seed(seed)
             elt = random.choices(TERMINALS_LIST, weights=TERMINALS_PROBA, k=1)[0]
-            self.content.append(round(random.uniform(CST_RANGE[0, CST_RANGE[1]),1) if elt == "cst" else elt)
-            seed = random.randint(0, 9999)
+            self.content.append(round(random.uniform(CST_RANGE[0], CST_RANGE[1]),1) if elt == "cst" else elt)
+            seed = random.randint(0, SEED_RANGE)
         self.depth = depth
     
     def generate_tree_growth(self, depth, seed=None):
         if seed == None :
-            self.gen_seed=random.randint(0, 9999)
+            self.gen_seed=random.randint(0, SEED_RANGE)
         else :
             self.gen_seed = seed
         seed = self.gen_seed  
@@ -66,12 +67,12 @@ class Tree(object):
             random.seed(seed)
             elt = random.choices(OPERATORS_LIST+TERMINALS_LIST, weights=OPERATORS_PROBA+TERMINALS_PROBA, k=1)[0]
             self.content.append(round(random.uniform(CST_RANGE[0], CST_RANGE[1]),1) if elt == "cst" else elt)
-            seed = random.randint(0, 9999)
+            seed = random.randint(0, SEED_RANGE)
         for i in range(2**(depth-1)):
             random.seed(seed)
             elt = random.choices(TERMINALS_LIST, weights=TERMINALS_PROBA, k=1)[0]
             self.content.append(round(random.uniform(CST_RANGE[0], CST_RANGE[1]),1) if elt == "cst" else elt)
-            seed = random.randint(0, 9999)
+            seed = random.randint(0, SEED_RANGE)
         for i in range(2**(depth)-2**(depth-1)-1):
             if not self.content[i] in OPERATORS_LIST :
                 self.content[(i+1)*2-1] = None
@@ -88,7 +89,7 @@ class Pop(object):
     
     def generate(self, n, depth, ratio=0.5, seed=None):
         if seed == None :
-            self.gen_seed=random.randint(0, 9999)
+            self.gen_seed=random.randint(0, SEED_RANGE) 
         else :
             self.gen_seed = seed
         seed = self.gen_seed
@@ -97,13 +98,13 @@ class Pop(object):
             tree = Tree(f"Tree number {i+1}")
             tree.generate_tree_full(depth, seed)
             self.content.append(tree)
-            seed = random.randint(0, 9999)
+            seed = random.randint(0, SEED_RANGE) 
         for i in range(int(n-n*ratio)):
             random.seed(seed)
             tree = Tree(f"Tree number {int(n*ratio)+i+1}")
             tree.generate_tree_growth(depth, seed)
             self.content.append(tree)
-            seed = random.randint(0, 9999)
+            seed = random.randint(0, SEED_RANGE)
         self.depth = depth
         self.gen = 1
 
