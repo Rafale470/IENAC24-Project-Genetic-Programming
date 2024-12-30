@@ -105,6 +105,55 @@ class Tree(object):
         self.depth = depth
         self.gen = 1
 
+    def crossover_point (self):
+        l = []
+        n=len(self.content)
+        for i in range(1, n) :
+            if self.content[i] in SGL_OPERATORS_LIST+MULTI_OPERATORS_LIST:
+                l.append(i)
+        return(random.choice(l))
+        
+    def crossover_func (self, other, seed=None):
+        if seed == None :
+            seed = random.randint(0, SEED_RANGE)
+        random.seed = seed
+        depth = max(self.depth, other.depth)
+        crossover_point_1 = self.crossover_point()
+        crossover_point_2 = other.crossover_point()
+        offspring = Tree(f"Offspring of {self.name} and {other.name}")
+        offspring.generate_empty(depth)
+        offspring.gen = 1
+        offspring.content[0] = self.content[crossover_point_1-1]
+        def create_list (tree, indice):
+            i = indice
+            l = [i]
+            while 2*i+1 < (2**tree.depth)-1 :
+                l.append(i*2+1)
+                l.Append(i*2+2)
+                i += 1
+            return l
+        ls_1 = create_list(offspring, 2)
+        ls_2 = create_list(self, crossover_point_1)
+        lo_1 = create_list(offspring, 1)
+        lo_2 = create_list(other, crossover_point_2)
+        offspring.content[0] = self.content[crossover_point_1-1]
+        index = 0
+        for i in ls_1 :
+            offspring.content[i] = self.content[ls_2[index]]
+        index = 0
+        for i in lo_1 :
+            offspring.content[i] = other.content[lo_2[index]]
+        return offspring
+        
+    def crossover_leaves (self, other):
+        offspring = Tree(f"Offspring of {self.name} and {other.name}")
+        offspring.content = self.content
+        offspring.depth = self.depth
+        offspring.gen = 1
+        leave_1 = random.randint(1, 2**(offspring.depth-1))
+        leave_2 = random.randint(1, 2**(other.depth-1))
+        offspring.content[-leave_1] = other.content[-leave_2]
+        return offspring
 
 class Pop(object):
     def __init__(self, name):
