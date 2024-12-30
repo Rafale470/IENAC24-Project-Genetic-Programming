@@ -140,9 +140,10 @@ class Tree(object):
         index = 0
         for i in ls_1 :
             offspring.content[i] = self.content[ls_2[index]]
-            index = 0
+        index = 0
         for i in lo_1 :
             offspring.content[i] = other.content[lo_2[index]]
+        return offspring
         
     def crossover_leaves (self, other):
         offspring = Tree(f"Offspring of {self.name} and {other.name}")
@@ -152,6 +153,7 @@ class Tree(object):
         leave_1 = random.randint(1, 2**(offspring.depth-1))
         leave_2 = random.randint(1, 2**(other.depth-1))
         offspring.content[-leave_1] = other.content[-leave_2]
+        return offspring
 
 class Pop(object):
     def __init__(self, name):
