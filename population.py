@@ -32,7 +32,8 @@ class Tree(object):
         self.depth = 0
         self.gen_seed = None
         self.gen = 0
-    
+    def evaluate(self, vars):
+        return eval(self.__repr__(), vars)
     def __repr__(self):
         def build_expression(i=0):
             if self.content[i] in MULTI_OPERATORS_LIST:
@@ -43,13 +44,12 @@ class Tree(object):
             elif self.content[i] in SGL_OPERATORS_LIST:
                 op = self.content[i]
                 inside = build_expression((i+1)*2-1)
-                return f"({self.get_operator_symbol(op)}({inside})"
+                return f"({self.get_operator_symbol(op)}({inside}))"
             elif isinstance(self.content[i], (int, float)):
                 return str(self.content[i])
             elif isinstance(self.content[i], sp.Symbol):
                 return str(self.content[i])
         return build_expression()
-    
     def get_operator_symbol(self, operator_func):
         for op_symbol, (op_func, _) in MULTI_OPERATORS.items():
             if op_func == operator_func:
@@ -113,7 +113,10 @@ class Pop(object):
         self.gen = 0
         self.depth = 0
         self.gen_seed = None
-    
+    def evaluate(self):
+        pass
+    def tournament_selection(self, tournament_size):
+        pass
     def generate(self, n, depth, ratio=0.5, seed=None):
         if seed == None :
             self.gen_seed=random.randint(0, SEED_RANGE)
@@ -136,6 +139,7 @@ class Pop(object):
         self.gen = 1
 
 
+
 if __name__ == "__main__":
     seed = random.randint(0,SEED_RANGE)
     print(seed)
@@ -144,7 +148,7 @@ if __name__ == "__main__":
     print(test)
     test2 = Tree("test3")
     test2.generate_tree_growth(3, seed)
-    print(test2)
+    print(test2.evaluate({"x": 2}))
     seed = random.randint(0,SEED_RANGE)
     print(seed)
     final_test = Pop("final_test")
