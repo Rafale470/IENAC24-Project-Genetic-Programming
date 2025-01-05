@@ -24,6 +24,18 @@ TERMINALS_PROBA = [item[1] for item in TERMINALS.values()]
 
 SEED_RANGE = 9999
 
+def create_list(tree_obj, i):
+                tree = list(range(2**tree_obj.depth-1))
+                if i >= len(tree) or tree[i] is None:
+                    return []
+                left_child_index = 2 * i + 1
+                right_child_index = 2 * i + 2
+                children = [i]
+                if left_child_index < len(tree) and tree[left_child_index] is not None:
+                    children += create_list(tree_obj, left_child_index)
+                if right_child_index < len(tree) and tree[right_child_index] is not None:
+                    children += create_list(tree_obj, right_child_index)
+                return sorted(children)
 
 class Tree(object):
     def __init__ (self, name):
@@ -110,8 +122,10 @@ class Tree(object):
         self.depth = depth
         self.gen = 1
         
-    
-    def crossover_point(self):
+    def crossover_point(self, seed=None):
+        if seed == None :
+            seed = random.randint(0, SEED_RANGE)
+        random.seed(seed)
         l = []
         n=len(self.content)
         for i in range(1, n) :
@@ -125,10 +139,13 @@ class Tree(object):
     def crossover_func(self, other, seed=None):
         if seed == None :
             seed = random.randint(0, SEED_RANGE)
-        random.seed = seed
+        random.seed(seed)
         depth = max(self.depth, other.depth)
-        crossover_point_1 = self.crossover_point()
-        crossover_point_2 = other.crossover_point()
+        crossover_point_1_seed = random.randint(0, SEED_RANGE)
+        random.seed(crossover_point_1_seed)
+        crossover_point_2_seed = random.randint(0, SEED_RANGE)
+        crossover_point_1 = self.crossover_point(crossover_point_1_seed)
+        crossover_point_2 = other.crossover_point(crossover_point_2_seed)
         if crossover_point_1 == 0 and crossover_point_2 == 0:
             self.crossover_leaves(other, seed)
         elif crossover_point_1 == 0 :
@@ -138,18 +155,6 @@ class Tree(object):
             offspring.generate_empty(depth)
             offspring.gen = 1
             offspring.content[0] = self.content[crossover_point_1-1]
-            def create_list(tree_obj, i):
-                tree = list(range(2**tree_obj.depth-1))
-                if i >= len(tree) or tree[i] is None:
-                    return []
-                left_child_index = 2 * i + 1
-                right_child_index = 2 * i + 2
-                children = [i]
-                if left_child_index < len(tree) and tree[left_child_index] is not None:
-                    children += create_list(tree_obj, left_child_index)
-                if right_child_index < len(tree) and tree[right_child_index] is not None:
-                    children += create_list(tree_obj, right_child_index)
-                return sorted(children)
             ls_1 = create_list(offspring, 2)
             ls_2 = create_list(self, crossover_point_1+crossover_point_1%2)
             lo_1 = create_list(offspring, 1)
@@ -168,7 +173,7 @@ class Tree(object):
     def crossover_leaves(self, other, seed=None):
         if seed == None :
             seed = random.randint(0, SEED_RANGE)
-        random.seed = seed
+        random.seed(seed)
         offspring = Tree(f"Offspring of {self.name} and {other.name}")
         offspring.content = self.content                
         offspring.depth = self.depth
@@ -185,6 +190,35 @@ class Tree(object):
         leave_2 = int(random.choices(l2)[0])
         offspring.content[leave_1] = other.content[leave_2]
         return offspring
+
+    def mutation_point(self, seed=None):
+        if seed == None :
+            seed = random.randint(0, SEED_RANGE)
+        random.seed(seed)
+        l = list(range(1, 2**self.depth-1))
+        return random.choices(l)[0]
+    
+    def mutation(self, seed=None):
+        if seed == None :
+            seed = random.randint(0, SEED_RANGE)
+        random.seed(seed)
+        mutation_point_seed = random.randint(0, SEED_RANGE)
+        mutation_point_1 = self.mutation_point(mutation_point_seed)
+        sub_depth = 1
+        while mutation_point_1 >= 2**sub_depth-1 :
+            sub_depth += 1
+        sub_depth = self.depth-sub_depth+1
+        sub_tree = Tree(f"Sub_tree for {self.name} mutation")
+        random.seed(mutation_point_seed)
+        sub_seed = random.randint(0, SEED_RANGE)
+        sub_tree.generate_tree_growth(sub_depth, sub_seed)
+        l1 = create_list(self, mutation_point_1)
+        l2 = create_list(sub_tree, 0)
+        index = 0
+        for i in l1 :
+            self.content[i] = sub_tree.content[l2[index]]
+            index += 1
+
 
 class Pop(object):
     def __init__(self, name):
@@ -241,3 +275,9 @@ if __name__ == "__main__":
     print(test3)
     test4 = test2.crossover_leaves(test)
     print(test4)
+    print("---------------------------")
+    print(test)
+    seed = random.randint(0,SEED_RANGE)
+    print(seed)
+    test.mutation(seed)
+    print(test)
