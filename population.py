@@ -3,14 +3,36 @@ import operator
 import sympy as sp
 import numpy as np
 
+"""population.py
+
+This module provides a framework for genetic programming, including tree-based representations 
+and operations such as crossover, mutation, and evaluation of expressions. The key components 
+are the `Tree` class, which models individual solutions as trees, and the `Pop` class, which 
+manages populations of trees."""
 
 def div_with0(a,b):
+    """Safely performs division, avoiding division by zero.
+
+    Parameters:
+        a (float): The numerator.
+        b (float): The denominator.
+
+    Returns:
+        float: The result of the division, or 0 if the denominator is 0."""
     return operator.truediv(a, b) if b!=0 else 0
 
 def pow_with0(a,b):
+    """Safely performs the power operation, handling edge cases with zero and negatives.
+
+    Parameters:
+        a (float): The base.
+        b (float): The exponent.
+
+    Returns:
+        float: The result of the power operation, or 0 for invalid cases."""
     return operator.pow(a, b) if b >=0 or a!=0 else 0
 
-MULTI_OPERATORS = {"+":(operator.add, 0.25), "-":(operator.sub, 0.25), "*":(operator.mul, 0.25), "/":(div_with0, 0.25), "**":(pow_with0, 0.25)} #objectif : Dans le futur, récupérer ce dictionnaire via un fichier de configuration
+MULTI_OPERATORS = {"+":(operator.add, 0.25), "-":(operator.sub, 0.25), "*":(operator.mul, 0.25), "/":(div_with0, 0.25), "**":(pow_with0, 0.25)}
 MULTI_OPERATORS_LIST = [item[0] for item in MULTI_OPERATORS.values()]
 MULTI_OPERATORS_PROBA = [item[1] for item in MULTI_OPERATORS.values()]
 
@@ -22,26 +44,47 @@ TERMINALS = {"x": (sp.Symbol("x"), 0.25), "cst":("cst", 0.25)}
 TERMINALS_LIST = [item[0] for item in TERMINALS.values()]
 TERMINALS_PROBA = [item[1] for item in TERMINALS.values()]
 
-SEED_RANGE = 9999
+SEED_RANGE = 9999       #Allow easily the change the range of different seed value in the code, may not have any great impact on it's execution
 
 
 
 def create_list(tree_obj, i):
-                tree = list(range(2**tree_obj.depth-1))
-                if i >= len(tree) or tree[i] is None:
-                    return []
-                left_child_index = 2 * i + 1
-                right_child_index = 2 * i + 2
-                children = [i]
-                if left_child_index < len(tree) and tree[left_child_index] is not None:
-                    children += create_list(tree_obj, left_child_index)
-                if right_child_index < len(tree) and tree[right_child_index] is not None:
-                    children += create_list(tree_obj, right_child_index)
-                return sorted(children)
+    """
+Constructs a list of indices for a node and its children in a tree.
+
+    Parameters:
+        tree_obj (Tree): The tree object containing nodes.
+        i (int): The index of the starting node.
+
+    Returns:
+        list: A sorted list of indices for the node and its children."""
+    tree = list(range(2**tree_obj.depth-1))
+    if i >= len(tree) or tree[i] is None:
+        return []
+    left_child_index = 2 * i + 1
+    right_child_index = 2 * i + 2
+    children = [i]
+    if left_child_index < len(tree) and tree[left_child_index] is not None:
+        children += create_list(tree_obj, left_child_index)
+    if right_child_index < len(tree) and tree[right_child_index] is not None:
+        children += create_list(tree_obj, right_child_index)
+    return sorted(children)
 
 
 class Tree(object):
+    """Represents a tree structure used in genetic programming.
+    Attributes:
+        name (str): The name of the tree.
+        content (list): The nodes of the tree.
+        depth (int): The depth of the tree. A tree with one node has a depth of 1
+        gen_seed (int): The seed value used for random number generation.
+        gen (int): The generation of the tree."""
+        
     def __init__ (self, name):
+        """Initializes a new Tree instance.
+        
+        Parameters:
+            name (str): The name of the tree."""
         self.name = name
         self.content = []
         self.depth = 0
@@ -49,6 +92,10 @@ class Tree(object):
         self.gen = 0
     
     def __repr__(self):
+        """Generates a string representation of the tree as a mathematical expression.
+        
+        Returns:
+            str: The mathematical expression represented by the tree."""
         def build_expression(i=0):
             if self.content[i] in MULTI_OPERATORS_LIST:
                 op = self.content[i]
@@ -66,6 +113,13 @@ class Tree(object):
         return build_expression()
     
     def get_operator_symbol(self, operator_func):
+        """Retrieves the symbol for a given operator function.
+        
+        Parameters:
+            operator_func (function): The operator function.
+            
+        Returns:
+            str: The operator symbol, or "?" if not found."""
         for op_symbol, (op_func, _) in MULTI_OPERATORS.items():
             if op_func == operator_func:
                 return op_symbol
@@ -75,6 +129,13 @@ class Tree(object):
         return "?"
     
     def get_operator_func(self, operator_symbol):
+        """Retrieves the function for a given operator symbol.
+        
+        Parameters:
+            operator_symbol (str): The operator symbol.
+            
+        Returns:
+            function: The operator function."""
         if operator_symbol in MULTI_OPERATORS :
             return MULTI_OPERATORS[operator_symbol][0]
         else :
@@ -84,11 +145,20 @@ class Tree(object):
         return eval(self.__repr__(), vars)
     
     def generate_empty(self, depth):
+        """Generates an empty tree with a specified depth.
+        
+        Parameters:
+            depth (int): The depth of the tree."""
         for i in range((2**depth)-1):
             self.content.append(None)
         self.depth = depth
     
     def generate_tree_full(self, depth, seed=None):
+        """Generates a full tree with all nodes populated.
+        
+        Parameters:
+            depth (int): The depth of the tree.
+            seed (int, optional): The seed for random number generation. Defaults to None."""
         if seed == None :
             self.gen_seed=random.randint(0, SEED_RANGE)
         else :
@@ -110,6 +180,11 @@ class Tree(object):
         self.gen = 1
     
     def generate_tree_growth(self, depth, seed=None):
+        """Generates a tree using the growth method, with variable structure.
+        
+        Parameters:
+            depth (int): The depth of the tree.
+            seed (int, optional): The seed for random number generation. Defaults to None."""
         if seed == None :
             self.gen_seed=random.randint(0, SEED_RANGE)
         else :
@@ -136,6 +211,13 @@ class Tree(object):
         
     
     def crossover_point(self, seed=None):
+        """Selects a crossover point within the tree.
+        
+        Parameters:
+            seed (int, optional): The seed for random number generation. Defaults to None.
+            
+        Returns:
+            int: The index of the crossover point."""
         if seed == None :
             seed = random.randint(0, SEED_RANGE)
         random.seed(seed)
@@ -150,6 +232,14 @@ class Tree(object):
             return(random.choice(l))
         
     def crossover_func(self, other, seed=None):
+        """Performs crossover with another tree to produce an offspring tree.
+        
+        Parameters:
+            other (Tree): The other tree to crossover with.
+            seed (int, optional): The seed for random number generation. Defaults to None.
+            
+        Returns:
+            Tree: The resulting offspring tree."""
         if seed == None :
             seed = random.randint(0, SEED_RANGE)
         random.seed(seed)
@@ -184,6 +274,14 @@ class Tree(object):
             return offspring
         
     def crossover_leaves(self, other, seed=None):
+        """Performs crossover at the leaf nodes with another tree.
+        
+        Parameters:
+            other (Tree): The other tree to crossover with.
+            seed (int, optional): The seed for random number generation. Defaults to None.
+            
+        Returns:
+            Tree: The resulting offspring tree."""
         if seed == None :
             seed = random.randint(0, SEED_RANGE)
         random.seed(seed)
@@ -205,6 +303,13 @@ class Tree(object):
         return offspring
     
     def mutation_point(self, seed=None):
+        """Selects a mutation point within the tree.
+        
+        Parameters:
+            seed (int, optional): The seed for random number generation. Defaults to None.
+            
+        Returns:
+            int: The index of the mutation point."""
         if seed == None :
             seed = random.randint(0, SEED_RANGE)
         random.seed(seed)
@@ -212,6 +317,10 @@ class Tree(object):
         return random.choices(l)[0]
     
     def mutation(self, seed=None):
+        """Applies mutation to a subtree within the tree.
+        
+        Parameters:
+            seed (int, optional): The seed for random number generation. Defaults to None."""
         if seed == None :
             seed = random.randint(0, SEED_RANGE)
         random.seed(seed)
@@ -234,7 +343,20 @@ class Tree(object):
 
 
 class Pop(object):
+    """Represents a population of trees for genetic programming.
+    
+    Attributes:
+        name (str): The name of the population.
+        content (list): The list of trees in the population.
+        gen (int): The generation number.
+        depth (int): The depth of the population's trees.
+        gen_seed (int): The seed value used for random number generation."""
+        
     def __init__(self, name):
+        """Initializes a new Pop instance.
+        
+        Parameters:
+            name (str): The name of the population."""
         self.name = name
         self.content = []
         self.gen = 0
@@ -242,6 +364,13 @@ class Pop(object):
         self.gen_seed = None
     
     def generate(self, n, depth, ratio=0.5, seed=None):
+        """Generates a population of trees.
+        
+        Parameters:
+            n (int): The number of trees in the population.
+            depth (int): The depth of the trees.
+            ratio (float): The ratio of full trees to growth trees. Defaults to 0.5.
+            seed (int, optional): The seed for random number generation. Defaults to None."""
         if seed == None :
             self.gen_seed=random.randint(0, SEED_RANGE)
         else :
