@@ -24,6 +24,8 @@ TERMINALS_PROBA = [item[1] for item in TERMINALS.values()]
 
 SEED_RANGE = 9999
 
+
+
 def create_list(tree_obj, i):
                 tree = list(range(2**tree_obj.depth-1))
                 if i >= len(tree) or tree[i] is None:
@@ -37,6 +39,7 @@ def create_list(tree_obj, i):
                     children += create_list(tree_obj, right_child_index)
                 return sorted(children)
 
+
 class Tree(object):
     def __init__ (self, name):
         self.name = name
@@ -44,8 +47,7 @@ class Tree(object):
         self.depth = 0
         self.gen_seed = None
         self.gen = 0
-    def evaluate(self, vars):
-        return eval(self.__repr__(), vars)
+    
     def __repr__(self):
         def build_expression(i=0):
             if self.content[i] in MULTI_OPERATORS_LIST:
@@ -62,6 +64,7 @@ class Tree(object):
             elif isinstance(self.content[i], sp.Symbol):
                 return str(self.content[i])
         return build_expression()
+    
     def get_operator_symbol(self, operator_func):
         for op_symbol, (op_func, _) in MULTI_OPERATORS.items():
             if op_func == operator_func:
@@ -70,6 +73,15 @@ class Tree(object):
             if op_func == operator_func:
                 return op_symbol
         return "?"
+    
+    def get_operator_func(self, operator_symbol):
+        if operator_symbol in MULTI_OPERATORS :
+            return MULTI_OPERATORS[operator_symbol][0]
+        else :
+            return SGL_OPERATORS[operator_symbol][0]
+    
+    def evaluate(self, vars):
+        return eval(self.__repr__(), vars)
     
     def generate_empty(self, depth):
         for i in range((2**depth)-1):
@@ -122,6 +134,7 @@ class Tree(object):
         self.depth = depth
         self.gen = 1
         
+    
     def crossover_point(self, seed=None):
         if seed == None :
             seed = random.randint(0, SEED_RANGE)
@@ -190,7 +203,7 @@ class Tree(object):
         leave_2 = int(random.choices(l2)[0])
         offspring.content[leave_1] = other.content[leave_2]
         return offspring
-
+    
     def mutation_point(self, seed=None):
         if seed == None :
             seed = random.randint(0, SEED_RANGE)
@@ -227,10 +240,7 @@ class Pop(object):
         self.gen = 0
         self.depth = 0
         self.gen_seed = None
-    def evaluate(self):
-        pass
-    def tournament_selection(self, tournament_size):
-        pass
+    
     def generate(self, n, depth, ratio=0.5, seed=None):
         if seed == None :
             self.gen_seed=random.randint(0, SEED_RANGE)
@@ -251,7 +261,6 @@ class Pop(object):
             seed = random.randint(0, SEED_RANGE)
         self.depth = depth
         self.gen = 1
-
 
 
 if __name__ == "__main__":
