@@ -1,6 +1,5 @@
 import random
 import operator
-import sympy as sp
 import numpy as np
 
 """population.py
@@ -12,22 +11,22 @@ manages populations of trees."""
 
 def div_with0(a,b):
     """Safely performs division, avoiding division by zero.
-
+    
     Parameters:
         a (float): The numerator.
         b (float): The denominator.
-
+        
     Returns:
         float: The result of the division, or 0 if the denominator is 0."""
     return operator.truediv(a, b) if b!=0 else 0
 
 def pow_with0(a,b):
     """Safely performs the power operation, handling edge cases with zero and negatives.
-
+    
     Parameters:
         a (float): The base.
         b (float): The exponent.
-
+        
     Returns:
         float: The result of the power operation, or 0 for invalid cases."""
     return operator.pow(a, b) if b >=0 or a!=0 else 0
@@ -40,7 +39,7 @@ SGL_OPERATORS = {"cos":(np.cos, 0.25), "sin":(np.sin, 0.25)}
 SGL_OPERATORS_LIST = [item[0] for item in SGL_OPERATORS.values()]
 SGL_OPERATORS_PROBA = [item[1] for item in SGL_OPERATORS.values()]
 
-TERMINALS = {"x": (sp.Symbol("x"), 0.25), "cst":("cst", 0.25)}
+TERMINALS = {"x": ("x", 0.25), "y": ("y", 0.25), "cst":("cst", 0.25)}
 TERMINALS_LIST = [item[0] for item in TERMINALS.values()]
 TERMINALS_PROBA = [item[1] for item in TERMINALS.values()]
 
@@ -49,13 +48,11 @@ SEED_RANGE = 9999       #Allow easily the change the range of different seed val
 
 
 def create_list(tree_obj, i):
-    """
-Constructs a list of indices for a node and its children in a tree.
-
+    """Constructs a list of indices for a node and its children in a tree.
     Parameters:
         tree_obj (Tree): The tree object containing nodes.
         i (int): The index of the starting node.
-
+        
     Returns:
         list: A sorted list of indices for the node and its children."""
     tree = list(range(2**tree_obj.depth-1))
@@ -106,9 +103,9 @@ class Tree(object):
                 op = self.content[i]
                 inside = build_expression(i*2+1)
                 return f"({self.get_operator_symbol(op)}({inside})"
-            elif isinstance(self.content[i], (int, float)):
+            elif type(self.content[i] == float):
                 return str(self.content[i])
-            elif isinstance(self.content[i], sp.Symbol):
+            elif self.content[i] in TERMINALS_LIST:
                 return str(self.content[i])
         return build_expression()
     
@@ -141,8 +138,28 @@ class Tree(object):
         else :
             return SGL_OPERATORS[operator_symbol][0]
     
-    def evaluate(self, vars):
-        return eval(self.__repr__(), vars)
+    def evaluate(self, vector_dict):
+        """Evaluate a tree for a vector given.
+        
+        Parameters:
+            vector_dict (dict): The vector.
+            
+        Returns:
+            float: The result."""
+        def build_eval(i=0):
+            if self.content[i] in MULTI_OPERATORS_LIST:
+                left = build_eval(i*2+1)
+                right = build_eval(i*2+2)
+                return self.content[i](left, right)
+            elif self.content[i] in SGL_OPERATORS_LIST:
+                inside = build_eval(i*2+1)
+                return self.content[i](inside)
+            elif type(self.content[i]) == float:
+                return self.content[i]
+            elif self.content[i] in TERMINALS_LIST:
+                return vector_dict[self.content[i]]
+        return build_eval()
+            
     
     def generate_empty(self, depth):
         """Generates an empty tree with a specified depth.
@@ -419,3 +436,7 @@ if __name__ == "__main__":
     print(seed)
     test.mutation(seed)
     print(test)
+    print("---------------------------")
+    print(test.gen_seed, test)
+    print(test.evaluate({"x":0, "y":2}))
+    print(test.evaluate({"x":1, "y":2}))
