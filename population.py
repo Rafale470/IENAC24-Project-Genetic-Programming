@@ -356,8 +356,14 @@ class Tree(object):
         if seed == None :
             seed = random.randint(0, SEED_RANGE)
         random.seed(seed)
-        l = list(range(1, 2**self.depth-1))
-        return random.choices(l)[0]
+        l = []
+        for i in range(1, 2**self.depth-1): 
+            if self.content[i] in SGL_OPERATORS_LIST+MULTI_OPERATORS_LIST:
+                l.append(i)
+        if len(l) == 0:
+            return 0
+        else :
+            return random.choices(l)[0]
     
     def mutation(self, seed=None):
         """Applies mutation to a subtree within the tree.
@@ -369,20 +375,23 @@ class Tree(object):
         random.seed(seed)
         mutation_point_seed = random.randint(0, SEED_RANGE)
         mutation_point_1 = self.mutation_point(mutation_point_seed)
-        sub_depth = 1
-        while mutation_point_1 >= 2**sub_depth-1 :
-            sub_depth += 1
-        sub_depth = self.depth-sub_depth+1
-        sub_tree = Tree(f"Sub_tree for {self.name} mutation")
-        random.seed(mutation_point_seed)
-        sub_seed = random.randint(0, SEED_RANGE)
-        sub_tree.generate_tree_growth(sub_depth, sub_seed)
-        l1 = create_list(self, mutation_point_1)
-        l2 = create_list(sub_tree, 0)
-        index = 0
-        for i in l1 :
-            self.content[i] = sub_tree.content[l2[index]]
-            index += 1
+        if mutation_point_1 == 0:
+            return None
+        else : 
+            sub_depth = 1
+            while mutation_point_1 >= 2**sub_depth-1 :
+                sub_depth += 1
+            sub_depth = self.depth-sub_depth+1
+            sub_tree = Tree(f"Sub_tree for {self.name} mutation")
+            random.seed(mutation_point_seed)
+            sub_seed = random.randint(0, SEED_RANGE)
+            sub_tree.generate_tree_growth(sub_depth, sub_seed)
+            l1 = create_list(self, mutation_point_1)
+            l2 = create_list(sub_tree, 0)
+            index = 0
+            for i in l1 :
+                self.content[i] = sub_tree.content[l2[index]]
+                index += 1
 
 
 class Pop(object):
@@ -464,16 +473,16 @@ if __name__ == "__main__":
     seed = random.randint(0,SEED_RANGE)
     print(seed)
     test = Tree("test")
-    test.generate_tree_full(3, seed)
+    test.generate_tree_full(5, seed)
     print(test)
     test2 = Tree("test3")
-    test2.generate_tree_growth(3, seed)
+    test2.generate_tree_growth(5, seed)
     print(test2)
     print("---------------------------")
     seed = random.randint(0,SEED_RANGE)
     print(seed)
     final_test = Pop("final_test")
-    final_test.generate(10, 3, 0.5, seed)
+    final_test.generate(10, 5, 0.5, seed)
     print(final_test.content)
     print("---------------------------")
     test3 = test2.crossover_func(test)
@@ -490,3 +499,21 @@ if __name__ == "__main__":
     print(test.gen_seed, test)
     print(test.evaluate({"x":0, "y":2}))
     print(test.evaluate({"x":1, "y":2}))
+    print("---------------------------")
+    pop = Pop("test")
+    pop.generate(1000, 5, 0.5, 8941)
+    print(pop.gen_seed)
+    def error(tree):
+        n = len(tree.content)-2**(tree.depth-1)
+        for i in range(n):
+            if tree.content[i] == None and (tree.content[2*i+1] != None or tree.content[2*i+2] != None):
+                return True
+        return False
+    for i in range(999):
+        offspring = pop.content[i].crossover_func(pop.content[i+1])
+        if error(offspring):
+            print(True)
+    for i in range(999):
+        pop.content[i].mutation()
+        if error(pop.content[i]):
+            print(True, i)
