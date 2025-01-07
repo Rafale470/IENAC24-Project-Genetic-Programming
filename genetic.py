@@ -16,7 +16,6 @@ def genetic_algorithm(pop_size, nb_gen, mutation_rate, crossover_rate, tournamen
     for i in range(nb_gen):
         #Evaluation de la population
         population.evaluate(y)
-        print(f"Generation {population.gen-1} : {population.content[0].fitness}")
         
         new_pop_content = []
 
@@ -26,18 +25,18 @@ def genetic_algorithm(pop_size, nb_gen, mutation_rate, crossover_rate, tournamen
             parent2 = population.tournament_selection(tournament_size)
             #Croisement
             children = parent1.crossover_func(parent2)
-            children.fitness_calc(y)
             if children == None:
                 continue
+            #if random.random() < mutation_rate:
+                #children.mutation()
             #Ajout des enfants à la nouvelle population
             new_pop_content.append(children)
         #Mutation
         #population.mutate(children, mutation_rate)
-        
-        for n in sorted(population.content, key=(lambda x :x.fitness))[:elitism]:
-            print(n.fitness)
         #Elitisme
         new_pop_content += sorted(population.content, key=(lambda x :x.fitness))[:elitism]
+
+
         #Mise à jour de la population
         population.content = new_pop_content
         #Affichage de la meilleure fitness
@@ -49,10 +48,10 @@ def genetic_algorithm(pop_size, nb_gen, mutation_rate, crossover_rate, tournamen
     population.evaluate(y)
     
     #Retourne le meilleur individu
-    return population.content[0]
+    return sorted(population.content, key=(lambda x : x.fitness))[0]
 
 #Test
 
-best = genetic_algorithm(10, 50, 0.1, 0.9, 3, 1)
+best = genetic_algorithm(300, 25, 0.1, 1, 10, 50)
 print(best)
 print(best.fitness)
