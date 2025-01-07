@@ -39,7 +39,7 @@ SGL_OPERATORS = {"cos":(np.cos, 0.25), "sin":(np.sin, 0.25)}
 SGL_OPERATORS_LIST = [item[0] for item in SGL_OPERATORS.values()]
 SGL_OPERATORS_PROBA = [item[1] for item in SGL_OPERATORS.values()]
 
-TERMINALS = {"x": ("x", 0.25), "y": ("y", 0), "cst":("cst", 0.25)}
+TERMINALS = {"x": ("x", 0.25), "y": ("y", 0.25), "cst":("cst", 0.25)}
 TERMINALS_LIST = [item[0] for item in TERMINALS.values()]
 TERMINALS_PROBA = [item[1] for item in TERMINALS.values()]
 
@@ -68,8 +68,6 @@ def create_list(tree_obj, i):
     return sorted(children)
 
 
-
-
 class Tree(object):
     """Represents a tree structure used in genetic programming.
     Attributes:
@@ -87,21 +85,9 @@ class Tree(object):
         self.name = name
         self.content = []
         self.depth = 0
-        self.fitness = 0
         self.gen_seed = None
         self.gen = 0
-    def fitness_calc(self, point_set):
-        """Evaluates the fitness of the tree based on a set of points.
-        
-        Parameters:
-            point_set (list): A list of dictionaries representing points.
-            
-        Returns:
-            float: The average fitness of the tree across all points."""
-        fitness = 0
-        for point in point_set :
-            fitness += abs(self.evaluate({"x":point[0]}) - point[1])**2
-        self.fitness = fitness/len(point_set)
+    
     def __repr__(self):
         """Generates a string representation of the tree as a mathematical expression.
         
@@ -295,11 +281,11 @@ class Tree(object):
             lo_2 = create_list(other, crossover_point_2)
             offspring.content[0] = self.content[int((crossover_point_1-1)/2) if crossover_point_1%2 != 0 else int((crossover_point_1-2)/2)]
             index = 0
-            for i in lo_1 :
+            for i in lo_1[:len(lo_2)] :
                 offspring.content[i] = other.content[lo_2[index]]
                 index += 1
             index = 0
-            for i in ls_1 :
+            for i in ls_1[:len(ls_2)] :
                 offspring.content[i] = self.content[ls_2[index]]
                 index += 1
             return offspring
@@ -393,31 +379,7 @@ class Pop(object):
         self.gen = 0
         self.depth = 0
         self.gen_seed = None
-    def evaluate(self, point_set):
-        """Evaluates the fitness of each tree in the population.
-        
-        Parameters:
-            point_set (list): A list of dictionaries representing points."""
-        for tree in self.content :
-            tree.fitness_calc(point_set)
-
-    def tournament_selection(self, tournament_size, seed=None):
-        """Selects the best tree from a random sample of trees.
-        
-        Parameters:
-            tournament_size (int): The number of trees to sample.
-            seed (int, optional): The seed for random number generation. Defaults to None.
-            
-        Returns:
-            Tree: The best tree from the sample."""
-        if seed == None :
-            seed = random.randint(0, SEED_RANGE)
-        random.seed(seed)
-        l = []
-        for i in range(tournament_size):
-            l.append(random.choice(self.content))
-        l.sort(key=lambda x: x.fitness, reverse=False)
-        return l[0]
+    
     def generate(self, n, depth, ratio=0.5, seed=None):
         """Generates a population of trees.
         
@@ -450,18 +412,19 @@ class Pop(object):
 if __name__ == "__main__":
     print("---------------------------")
     seed = random.randint(0,SEED_RANGE)
+    seed = 7374
     print(seed)
     test = Tree("test")
-    test.generate_tree_full(3, seed)
+    test.generate_tree_full(5, seed)
     print(test)
     test2 = Tree("test3")
-    test2.generate_tree_growth(3, seed)
+    test2.generate_tree_growth(5, seed)
     print(test2)
     print("---------------------------")
     seed = random.randint(0,SEED_RANGE)
     print(seed)
     final_test = Pop("final_test")
-    final_test.generate(10, 3, 0.5, seed)
+    final_test.generate(10, 5, 0.5, seed)
     print(final_test.content)
     print("---------------------------")
     test3 = test2.crossover_func(test)
@@ -478,3 +441,4 @@ if __name__ == "__main__":
     print(test.gen_seed, test)
     print(test.evaluate({"x":0, "y":2}))
     print(test.evaluate({"x":1, "y":2}))
+
