@@ -29,17 +29,25 @@ def pow_with0(a,b):
         
     Returns:
         float: The result of the power operation, or 0 for invalid cases."""
-    return operator.pow(a, b) if b >=0 or a!=0 else 0
+    """ Managing complex number too"""
+    if a < 0 and not(float(b).is_integer()):
+        return 0.0
+    res = operator.pow(a, b) if not(isinstance(b, complex)) and (b >=0 or a!=0) else 0.0
 
-MULTI_OPERATORS = {"+":(operator.add, 0.25), "-":(operator.sub, 0.25), "*":(operator.mul, 0.25), "/":(div_with0, 0.25), "**":(pow_with0, 0.25)}
+    if (isinstance(res, complex)):
+        print("Alerte !")
+    
+    return res
+
+MULTI_OPERATORS = {"+":(operator.add, 0.25), "-":(operator.sub, 0.25), "*":(operator.mul, 0.25), "/":(div_with0, 0), "**":(pow_with0, 0)}
 MULTI_OPERATORS_LIST = [item[0] for item in MULTI_OPERATORS.values()]
 MULTI_OPERATORS_PROBA = [item[1] for item in MULTI_OPERATORS.values()]
 
-SGL_OPERATORS = {"cos":(np.cos, 0.25), "sin":(np.sin, 0.25)}
+SGL_OPERATORS = {"cos":(np.cos, 0.0), "sin":(np.sin, 0.0)}
 SGL_OPERATORS_LIST = [item[0] for item in SGL_OPERATORS.values()]
 SGL_OPERATORS_PROBA = [item[1] for item in SGL_OPERATORS.values()]
 
-TERMINALS = {"x": ("x", 0.25), "y": ("y", 0.25), "cst":("cst", 0.25)}
+TERMINALS = {"x": ("x", 0.25), "y": ("y", 0), "cst":("cst", 0.25)}
 TERMINALS_LIST = [item[0] for item in TERMINALS.values()]
 TERMINALS_PROBA = [item[1] for item in TERMINALS.values()]
 
@@ -68,6 +76,8 @@ def create_list(tree_obj, i):
     return sorted(children)
 
 
+
+
 class Tree(object):
     """Represents a tree structure used in genetic programming.
     Attributes:
@@ -85,9 +95,21 @@ class Tree(object):
         self.name = name
         self.content = []
         self.depth = 0
+        self.fitness = 0
         self.gen_seed = None
         self.gen = 0
-    
+    def fitness_calc(self, point_set):
+        """Evaluates the fitness of the tree based on a set of points.
+        
+        Parameters:
+            point_set (list): A list of dictionaries representing points.
+            
+        Returns:
+            float: The average fitness of the tree across all points."""
+        fitness = 0
+        for point in point_set :
+            fitness += abs(self.evaluate({"x":point[0]}) - point[1])**2
+        self.fitness = fitness/len(point_set)
     def __repr__(self):
         """Generates a string representation of the tree as a mathematical expression.
         
@@ -193,6 +215,9 @@ class Tree(object):
         for i in range(2**(depth)-2**(depth-1)-1):
             if self.content[i] in SGL_OPERATORS_LIST :
                 self.content[i*2+2] = None
+            if self.content[i] == None:
+                self.content[i*2+1] = None
+                self.content[i*2+2] = None
         self.depth = depth
         self.gen = 1
     
@@ -266,8 +291,9 @@ class Tree(object):
         crossover_point_2_seed = random.randint(0, SEED_RANGE)
         crossover_point_1 = self.crossover_point(crossover_point_1_seed)
         crossover_point_2 = other.crossover_point(crossover_point_2_seed)
+        
         if crossover_point_1 == 0 and crossover_point_2 == 0:
-            self.crossover_leaves(other, seed)
+            return self.crossover_leaves(other, seed)
         elif crossover_point_1 == 0 :
             return other.crossover_func(self, seed)
         else :
@@ -379,7 +405,31 @@ class Pop(object):
         self.gen = 0
         self.depth = 0
         self.gen_seed = None
-    
+    def evaluate(self, point_set):
+        """Evaluates the fitness of each tree in the population.
+        
+        Parameters:
+            point_set (list): A list of dictionaries representing points."""
+        for tree in self.content :
+            tree.fitness_calc(point_set)
+
+    def tournament_selection(self, tournament_size, seed=None):
+        """Selects the best tree from a random sample of trees.
+        
+        Parameters:
+            tournament_size (int): The number of trees to sample.
+            seed (int, optional): The seed for random number generation. Defaults to None.
+            
+        Returns:
+            Tree: The best tree from the sample."""
+        if seed == None :
+            seed = random.randint(0, SEED_RANGE)
+        random.seed(seed)
+        l = []
+        for i in range(tournament_size):
+            l.append(random.choice(self.content))
+        l.sort(key=lambda x: x.fitness, reverse=False)
+        return l[0]
     def generate(self, n, depth, ratio=0.5, seed=None):
         """Generates a population of trees.
         
@@ -412,19 +462,18 @@ class Pop(object):
 if __name__ == "__main__":
     print("---------------------------")
     seed = random.randint(0,SEED_RANGE)
-    seed = 7374
     print(seed)
     test = Tree("test")
-    test.generate_tree_full(5, seed)
+    test.generate_tree_full(3, seed)
     print(test)
     test2 = Tree("test3")
-    test2.generate_tree_growth(5, seed)
+    test2.generate_tree_growth(3, seed)
     print(test2)
     print("---------------------------")
     seed = random.randint(0,SEED_RANGE)
     print(seed)
     final_test = Pop("final_test")
-    final_test.generate(10, 5, 0.5, seed)
+    final_test.generate(10, 3, 0.5, seed)
     print(final_test.content)
     print("---------------------------")
     test3 = test2.crossover_func(test)
@@ -441,4 +490,3 @@ if __name__ == "__main__":
     print(test.gen_seed, test)
     print(test.evaluate({"x":0, "y":2}))
     print(test.evaluate({"x":1, "y":2}))
-
