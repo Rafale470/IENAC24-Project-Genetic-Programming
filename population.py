@@ -39,7 +39,7 @@ SGL_OPERATORS = {"cos":(np.cos, 0.25), "sin":(np.sin, 0.25)}
 SGL_OPERATORS_LIST = [item[0] for item in SGL_OPERATORS.values()]
 SGL_OPERATORS_PROBA = [item[1] for item in SGL_OPERATORS.values()]
 
-TERMINALS = {"x": ("x", 0.25), "y": ("y", 0.25), "cst":("cst", 0.25)}
+TERMINALS = {"x": ("x", 0.25), "y": ("y", 0), "cst":("cst", 0.25)}
 TERMINALS_LIST = [item[0] for item in TERMINALS.values()]
 TERMINALS_PROBA = [item[1] for item in TERMINALS.values()]
 
@@ -68,6 +68,8 @@ def create_list(tree_obj, i):
     return sorted(children)
 
 
+
+
 class Tree(object):
     """Represents a tree structure used in genetic programming.
     Attributes:
@@ -85,9 +87,21 @@ class Tree(object):
         self.name = name
         self.content = []
         self.depth = 0
+        self.fitness = 0
         self.gen_seed = None
         self.gen = 0
-    
+    def fitness_calc(self, point_set):
+        """Evaluates the fitness of the tree based on a set of points.
+        
+        Parameters:
+            point_set (list): A list of dictionaries representing points.
+            
+        Returns:
+            float: The average fitness of the tree across all points."""
+        fitness = 0
+        for point in point_set :
+            fitness += abs(self.evaluate({"x":point[0]}) - point[1])**2
+        self.fitness = fitness/len(point_set)
     def __repr__(self):
         """Generates a string representation of the tree as a mathematical expression.
         
@@ -379,7 +393,31 @@ class Pop(object):
         self.gen = 0
         self.depth = 0
         self.gen_seed = None
-    
+    def evaluate(self, point_set):
+        """Evaluates the fitness of each tree in the population.
+        
+        Parameters:
+            point_set (list): A list of dictionaries representing points."""
+        for tree in self.content :
+            tree.fitness_calc(point_set)
+
+    def tournament_selection(self, tournament_size, seed=None):
+        """Selects the best tree from a random sample of trees.
+        
+        Parameters:
+            tournament_size (int): The number of trees to sample.
+            seed (int, optional): The seed for random number generation. Defaults to None.
+            
+        Returns:
+            Tree: The best tree from the sample."""
+        if seed == None :
+            seed = random.randint(0, SEED_RANGE)
+        random.seed(seed)
+        l = []
+        for i in range(tournament_size):
+            l.append(random.choice(self.content))
+        l.sort(key=lambda x: x.fitness, reverse=False)
+        return l[0]
     def generate(self, n, depth, ratio=0.5, seed=None):
         """Generates a population of trees.
         
