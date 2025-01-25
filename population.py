@@ -41,7 +41,7 @@ def pow_with0(a,b):
 
 MULTI_OPERATORS_INIT = {"+":(operator.add), "-":(operator.sub), "*":(operator.mul), "/":(div_with0), "**":(pow_with0)}
 SGL_OPERATORS_INIT = {"cos":(np.cos), "sin":(np.sin)}
-TERMINALS_INIT = {"x": (sp.Symbol("x")), "cst":("cst")}
+TERMINALS_INIT = {"x": ("x"), "cst":("cst")}
 
 TERMINALS = {}
 SGL_OPERATORS = {}
