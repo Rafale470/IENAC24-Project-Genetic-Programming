@@ -39,19 +39,44 @@ def pow_with0(a,b):
     
     return res
 
-MULTI_OPERATORS = {"+":(operator.add, 0.25), "-":(operator.sub, 0.25), "*":(operator.mul, 0.25), "/":(div_with0, 0), "**":(pow_with0, 0)}
+MULTI_OPERATORS_INIT = {"+":(operator.add), "-":(operator.sub), "*":(operator.mul), "/":(div_with0), "**":(pow_with0)}
+SGL_OPERATORS_INIT = {"cos":(np.cos), "sin":(np.sin)}
+TERMINALS_INIT = {"x": (sp.Symbol("x")), "cst":("cst")}
+
+TERMINALS = {}
+SGL_OPERATORS = {}
+MULTI_OPERATORS = {}
+# dans le fichier "config.txt", écrire sur le première ligne les relations, sur la 2e, les fonctions composables, sur le 3e, les terminaux , et la proba, séparé d'un espace
+with open ("config.txt") as config:
+    mylist = list(config)
+    ligne1 = mylist[0]
+    ligne2 = mylist[1]
+    ligne3 = mylist[2]
+    
+    tableau_ligne1 = ligne1.strip().split() # création d'une liste constitué des éléments de la première ligne
+    for i in range (len(tableau_ligne1)//2):
+        MULTI_OPERATORS[tableau_ligne1[2*i]] = (MULTI_OPERATORS_INIT[tableau_ligne1[2*i]], float(tableau_ligne1[2*i+1])) #les opérations remplissent les indices pairs, les proba remplissent les indices impairs
+
+    tableau_ligne2 = ligne2.strip().split()
+    for i in range (len(tableau_ligne2)//2):
+        SGL_OPERATORS[tableau_ligne2[2*i]] = (SGL_OPERATORS_INIT[tableau_ligne2[2*i]], float(tableau_ligne2[2*i+1]))
+
+    tableau_ligne3 = ligne3.strip().split()
+    for i in range (len(tableau_ligne3)//2):
+        TERMINALS[tableau_ligne3[2*i]] = (TERMINALS_INIT[tableau_ligne3[2*i]], float(tableau_ligne3[2*i+1]))
+
+
+
 MULTI_OPERATORS_LIST = [item[0] for item in MULTI_OPERATORS.values()]
 MULTI_OPERATORS_PROBA = [item[1] for item in MULTI_OPERATORS.values()]
 
-SGL_OPERATORS = {"cos":(np.cos, 0.0), "sin":(np.sin, 0.0)}
 SGL_OPERATORS_LIST = [item[0] for item in SGL_OPERATORS.values()]
 SGL_OPERATORS_PROBA = [item[1] for item in SGL_OPERATORS.values()]
 
-TERMINALS = {"x": ("x", 0.25), "y": ("y", 0), "cst":("cst", 0.25)}
 TERMINALS_LIST = [item[0] for item in TERMINALS.values()]
 TERMINALS_PROBA = [item[1] for item in TERMINALS.values()]
 
-SEED_RANGE = 9999       #Allow easily the change the range of different seed value in the code, may not have any great impact on it's execution
+SEED_RANGE = 9999
 
 
 
