@@ -41,7 +41,7 @@ def pow_with0(a,b):
 
 MULTI_OPERATORS_INIT = {"+":(operator.add), "-":(operator.sub), "*":(operator.mul), "/":(div_with0), "**":(pow_with0)}
 SGL_OPERATORS_INIT = {"cos":(np.cos), "sin":(np.sin)}
-TERMINALS_INIT = {"x": (sp.Symbol("x")), "cst":("cst")}
+TERMINALS_INIT = {"x": ("x"), "cst":("cst")}
 
 TERMINALS = {}
 SGL_OPERATORS = {}
@@ -277,7 +277,7 @@ class Tree(object):
         self.gen = 1
         
     
-    def crossover_point(self, seed=None):
+    def crossover_point(self, seed=None, depth=None):
         """Selects a crossover point within the tree.
         
         Parameters:
@@ -290,7 +290,11 @@ class Tree(object):
         random.seed(seed)
         l = []
         n=len(self.content)
-        for i in range(1, n) :
+        if depth == None:
+            init = 1
+        else :
+            init = 2**(depth-1)-1
+        for i in range(init, n) :
             if self.content[i] in SGL_OPERATORS_LIST or self.content[i] in MULTI_OPERATORS_LIST:
                 l.append(i)
         if len(l) == 0 :
@@ -315,7 +319,11 @@ class Tree(object):
         random.seed(crossover_point_1_seed)
         crossover_point_2_seed = random.randint(0, SEED_RANGE)
         crossover_point_1 = self.crossover_point(crossover_point_1_seed)
-        crossover_point_2 = other.crossover_point(crossover_point_2_seed)
+        sub_depth = 1
+        while crossover_point_1 >= 2**sub_depth-1 :
+            sub_depth += 1
+        sub_depth = self.depth-sub_depth+1
+        crossover_point_2 = other.crossover_point(crossover_point_2_seed, sub_depth)
         
         if crossover_point_1 == 0 and crossover_point_2 == 0:
             return self.crossover_leaves(other, seed)
