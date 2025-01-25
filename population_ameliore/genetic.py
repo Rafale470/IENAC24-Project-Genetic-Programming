@@ -7,7 +7,7 @@ import numpy as np
 from popavecclasses import Pop
 
 a = np.linspace(INTERVALLE_MIN, INTERVALLE_MAX, NOMBRE_POINTS) 
-y = [(x, x**2+x*2) for x in a] # remplacer (x, x**2+x*2) par (x, FONCTION_CIBLE) ne fonctione pas, je ne sais pas comment faire
+y = [(x, eval(FONCTION_CIBLE)) for x in a] # remplacer (x, x**2+x*2) par (x, FONCTION_CIBLE) ne fonctione pas, je ne sais pas comment faire
 def genetic_algorithm(pop_size, nb_gen, mutation_rate, crossover_rate, tournament_size, elitism):
     #Initialisation de la population
     population = Pop("population")
