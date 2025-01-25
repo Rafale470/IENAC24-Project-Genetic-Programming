@@ -13,7 +13,7 @@ func_set = [
 ]
 
 # Terminaux : uniquement "x" et quelques constantes
-term_set = [Terminal("x")] + [Terminal(i) for i in range(-10, 10)]
+term_set = [Terminal("x")] + [Terminal("cst")]
 
 
 # Fonction cible : f(x) = x^2 + x + 1
@@ -22,19 +22,19 @@ def fonction_cible(x):
 
 
 # Points d'échantillonnage : dense autour de 0, répartis sur [-5, 5]
-points = [{"x": random.uniform(-1, 1)} for _ in range(100)]
+points = [{"x": random.uniform(1, 10)} for _ in range(100)]
 
 # Création de la population
 population = Population(
     taille=4000,
-    profondeur_max=2,  # Réduire la profondeur maximale pour limiter la complexité
+    profondeur_max=5,  # Réduire la profondeur maximale pour limiter la complexité
     term_set=term_set,
     func_set=func_set,
     fonction_cible=fonction_cible,
     points=points,
-    proba_crossover=0.5,
-    proba_mutation=0,
-    proba_mutation_point=0,
+    proba_crossover=0.8,
+    proba_mutation=0.1,
+    proba_mutation_point=0.01,
 )
 
 # Génération de la population initiale

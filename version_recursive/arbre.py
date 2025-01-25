@@ -1,5 +1,6 @@
 import random
 from noeud import NoeudInterne, NoeudExterne
+from terminaux import Terminal
 
 class Arbre:
 
@@ -32,12 +33,17 @@ class Arbre:
         # Si la profondeur maximale est atteinte, on ajoute un terminal
         if profondeur == 0:
             terminal = random.choice(self.term_set)
+            if terminal.valeur == "cst":
+                    return NoeudExterne(Terminal(int(random.uniform(-10, 10))), profondeur=profondeur)
             return NoeudExterne(terminal, profondeur)
 
         if method == "grow":
             # On décide aléatoirement de créer un terminal ou un nœud interne
             if random.random() < len(self.term_set) / (len(self.term_set) + len(self.func_set)):
                 terminal = random.choice(self.term_set)
+                
+                if terminal.valeur == "cst":
+                    return NoeudExterne(Terminal(int(random.uniform(-10, 10))), profondeur=profondeur)
                 return NoeudExterne(terminal, profondeur=profondeur)
 
         # Méthode full (ou grow qui décide de générer un nœud interne)
@@ -142,10 +148,12 @@ class Arbre:
         if isinstance(noeud, NoeudExterne):
             # Remplacer un terminal par un autre
             nouveau_terminal = random.choice(self.term_set)
-            nouveau_noeud = NoeudExterne(nouveau_terminal)
+            if nouveau_terminal.valeur == "cst":
+                    nouveau_noeud = NoeudExterne(Terminal(random.uniform(-10, 10)))
+            else: nouveau_noeud = NoeudExterne(nouveau_terminal)
         elif isinstance(noeud, NoeudInterne):
             # Remplacer un sous-arbre par un nouvel arbre généré
-            nouveau_noeud = self._generer_noeud(self.profondeur_max, method="grow")
+            nouveau_noeud = self._generer_noeud(self.profondeur_max-noeud.profondeur, method="grow")
         else:
             raise ValueError("Type de nœud inconnu pour mutation.")
 
@@ -156,6 +164,7 @@ class Arbre:
             # Remplacer le nœud dans son parent
             index = parent.enfants.index(noeud)
             parent.enfants[index] = nouveau_noeud
+        self.racine.update_profondeur(0)
 
     def _copier_arbre(self, noeud):
         """
@@ -225,6 +234,6 @@ class Arbre:
             noeud.fonction = nouvelle_fonction
         elif isinstance(noeud, NoeudExterne):
             # Mutation de terminal : remplacer par un autre terminal
-            noeud.terminal = random.choice(self.term_set)
+            noeud.terminal.value = random.uniform(-10, 10)
         else:
             raise ValueError("Type de nœud inconnu pour mutation.")
