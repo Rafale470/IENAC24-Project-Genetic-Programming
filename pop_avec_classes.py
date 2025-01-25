@@ -19,7 +19,7 @@ def div_with0(a,b):
         
     Returns:
         float: The result of the division, or 0 if the denominator is 0."""
-    return operator.truediv(a, b) if b!=0 else 0
+    return operator.truediv(a, b) if b!=0 else 1
 
 def pow_with0(a,b):
     """Safely performs the power operation, handling edge cases with zero and negatives.
@@ -51,48 +51,29 @@ MULTI_OPERATORS_LIST = []
 # dans le fichier "config.txt", écrire sur le première ligne les relations, sur la 2e, les fonctions composables, sur le 3e, les terminaux , et la proba, séparé d'un espace
 with open ("config.txt") as config:
     mylist = list(config)
-    ligne1 = mylist[0]
-    ligne2 = mylist[1]
-    ligne3 = mylist[2]
+    ligne1 = mylist[3]
+    ligne2 = mylist[6]
+    ligne3 = mylist[9]
     
     tableau_ligne1 = ligne1.strip().split() # création d'une liste constitué des éléments de la première ligne
     for i in range (len(tableau_ligne1)//2):
-        print(i)
-       # MULTI_OPERATORS1[tableau_ligne1[2*i]] = (MULTI_OPERATORS_INIT[tableau_ligne1[2*i]], float(tableau_ligne1[2*i+1])) #les opérations remplissent les indices pairs, les proba remplissent les indices impairs
-        MULTI_OPERATORS_LIST.append(fonction(tableau_ligne1[2*i],MULTI_OPERATORS_INIT[tableau_ligne1[2*i]], float(tableau_ligne1[2*i+1]), "multi"))
+        MULTI_OPERATORS_LIST.append(fonction(MULTI_OPERATORS_INIT[tableau_ligne1[2*i]],tableau_ligne1[2*i], float(tableau_ligne1[2*i+1]), "multi"))
     tableau_ligne2 = ligne2.strip().split()
     for i in range (len(tableau_ligne2)//2):
-       # SGL_OPERATORS1[tableau_ligne2[2*i]] = (SGL_OPERATORS_INIT[tableau_ligne2[2*i]], float(tableau_ligne2[2*i+1]))
-        SGL_OPERATORS_LIST.append(fonction(tableau_ligne2[2*i], SGL_OPERATORS_INIT[tableau_ligne2[2*i]], float(tableau_ligne2[2*i+1]), "sgl"))
+        SGL_OPERATORS_LIST.append(fonction(SGL_OPERATORS_INIT[tableau_ligne2[2*i]],tableau_ligne2[2*i], float(tableau_ligne2[2*i+1]), "sgl"))
 
     tableau_ligne3 = ligne3.strip().split()
     for i in range (len(tableau_ligne3)//2):
-        #TERMINALS1[tableau_ligne3[2*i]] = (TERMINALS_INIT[tableau_ligne3[2*i]], float(tableau_ligne3[2*i+1]))
-        TERMINALS_LIST.append(fonction(tableau_ligne3[2*i], TERMINALS_INIT[tableau_ligne3[2*i]], float(tableau_ligne3[2*i+1]), "terminals"))
+        TERMINALS_LIST.append(fonction(TERMINALS_INIT[tableau_ligne3[2*i]],tableau_ligne3[2*i],float(tableau_ligne3[2*i+1]), "terminals"))
 
 
-
-#MULTI_OPERATORS_LIST = [item[0] for item in MULTI_OPERATORS.values()]
-#MULTI_OPERATORS_LIST = [func.noun for func in MULTI_OPERATORS]
-#MULTI_OPERATORS_PROBA = [item[1] for item in MULTI_OPERATORS.values()]
 MULTI_OPERATORS_PROBA = [func.weight for func in MULTI_OPERATORS_LIST]
 
-#SGL_OPERATORS_LIST = [item[0] for item in SGL_OPERATORS.values()]
-#SGL_OPERATORS_LIST = [func.noun for func in SGL_OPERATORS]
-#SGL_OPERATORS_PROBA = [item[1] for item in SGL_OPERATORS.values()]
 SGL_OPERATORS_PROBA = [func.weight for func in SGL_OPERATORS_LIST]
-
-#TERMINALS_LIST = [item[0] for item in TERMINALS.values()]
-#TERMINALS_LIST = [func.noun for func in TERMINALS]
-#TERMINALS_PROBA = [item[1] for item in TERMINALS.values()]
 
 TERMINALS_PROBA = [func.weight for func in TERMINALS_LIST]
 
 SEED_RANGE = 9999
-
-print(MULTI_OPERATORS_LIST)
-print(SGL_OPERATORS_LIST)
-print(TERMINALS_LIST)
 
 
 
@@ -192,7 +173,6 @@ class Tree(object):
             elif self.content[i].type == "cst":
                 return self.content[i].noun
             elif self.content[i].type == "terminals":
-                print(f" symbol = {self.content[i].symbol}")
                 return vector_dict[self.content[i].symbol]
         return build_eval()
             
