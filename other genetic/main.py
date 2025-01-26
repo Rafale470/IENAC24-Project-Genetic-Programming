@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QMainWindow
 from interface import Ui_MainWindow  # Généré à partir du fichier .ui
 from PyQt5.QtWidgets import QApplication
 import matplotlib.pyplot as plt
-from genetic import genetic_algorithm
+from genetic import genetic_algorithm, genetic_darwin
 from fonctions import *
 import operator
 from fonctions_spec import *
@@ -61,6 +61,8 @@ def main(config_file):
     ELITISM.c = 50
     RATIO_FULL_TREES.c = 0.5
     SEED_RANGE.c = 9999
+    PROBA_CROSSOVER_LEAVES.c = 0.10
+    DARWIN_FACTOR.c = 0.5
     
     def fonction_cible(x):
         return eval(FONCTION_CIBLE.c)
@@ -68,15 +70,18 @@ def main(config_file):
     points = np.linspace(INTERVALLE_MIN.c, INTERVALLE_MAX.c, NOMBRE_POINTS.c)
     
     # Lancer l'évolution
-    meilleur_arbre = genetic_algorithm(TAILLE_POPULATION.c, GENERATION_MAX.c, PROBA_MUTATION.c, PROBA_CROSSOVER.c, TOURNAMENT_SIZE.c, ELITISM.c, INTERVALLE_MIN.c, INTERVALLE_MAX.c, NOMBRE_POINTS.c, FONCTION_CIBLE.c)
+    meilleur_arbre_elit = genetic_algorithm(TAILLE_POPULATION.c, GENERATION_MAX.c, PROBA_MUTATION.c, PROBA_CROSSOVER.c, TOURNAMENT_SIZE.c, ELITISM.c, INTERVALLE_MIN.c, INTERVALLE_MAX.c, NOMBRE_POINTS.c, FONCTION_CIBLE.c)
+    meilleur_arbre_darwin = genetic_darwin(TAILLE_POPULATION.c, GENERATION_MAX.c, PROBA_MUTATION.c, PROBA_CROSSOVER.c, PROBA_CROSSOVER_LEAVES.c, INTERVALLE_MIN.c, INTERVALLE_MAX.c, NOMBRE_POINTS.c, FONCTION_CIBLE.c, DARWIN_FACTOR.c)
 
     # Afficher les résultats
     print("=== Résultat Final ===")
-    print(f"Meilleur individu : {meilleur_arbre}")
-    print(f"Fitness : {meilleur_arbre.fitness}")
+    print(f"Meilleur individu elitisme : {meilleur_arbre_elit}")
+    print(f"Fitness : {meilleur_arbre_elit.fitness}")
+    print(f"Meilleur individu darwin : {meilleur_arbre_darwin}")
+    print(f"Fitness : {meilleur_arbre_darwin.fitness}")
 
     # Afficher le graphique
-    afficher_graphique(meilleur_arbre, fonction_cible, INTERVALLE_MIN.c, INTERVALLE_MAX.c)
+    afficher_graphique(meilleur_arbre_elit, meilleur_arbre_darwin, fonction_cible, INTERVALLE_MIN.c, INTERVALLE_MAX.c)
 
 
 def sauvegarder_parametres(self, fichier="./genetique/config_simulation.txt", parametres=None):
@@ -168,7 +173,7 @@ class MainApp(QMainWindow):
         sauvegarder_parametres(self, fichier="config_simulation.txt", parametres=parametres)
         main("config_simulation.txt")
 
-def afficher_graphique(meilleur_arbre, fonction_cible, intervalle_min, intervalle_max):
+def afficher_graphique(meilleur_arbre_elit, meilleur_arbre_darwin, fonction_cible, intervalle_min, intervalle_max):
     """
     Affiche le graphique comparant la fonction cible et la fonction trouvée.
     :param meilleur_arbre: L'arbre trouvé par l'algorithme génétique.
@@ -190,12 +195,14 @@ def afficher_graphique(meilleur_arbre, fonction_cible, intervalle_min, intervall
                 y_vals.append(float("inf"))  # En cas d'erreur (ex. division par zéro)
         return np.array(y_vals)
 
-    y_trouvee = evaluer_fonction_trouvee(meilleur_arbre, x_vals)
+    y_trouvee_elit = evaluer_fonction_trouvee(meilleur_arbre_elit, x_vals)
+    y_trouvee_darwin = evaluer_fonction_trouvee(meilleur_arbre_darwin, x_vals)
 
     # Tracer les graphiques
     plt.figure(figsize=(10, 6))
     plt.plot(x_vals, y_cible, label="Fonction cible", color="blue", linewidth=2)
-    plt.plot(x_vals, y_trouvee, label="Fonction trouvée", color="red", linestyle="--", linewidth=2)
+    plt.plot(x_vals, y_trouvee_elit, label="Fonction trouvée elitisme", color="red", linestyle="--", linewidth=2)
+    plt.plot(x_vals, y_trouvee_darwin, label="Fonction trouvée darwin", color="red", linestyle="--", linewidth=2)
     plt.xlabel("x", fontsize=14)
     plt.ylabel("f(x)", fontsize=14)
     plt.title("Comparaison entre la fonction cible et la fonction trouvée", fontsize=16)
@@ -206,9 +213,9 @@ def afficher_graphique(meilleur_arbre, fonction_cible, intervalle_min, intervall
     plt.show()
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    main_window = MainApp()
-    main_window.show()
-    sys.exit(app.exec_())
-
+    #app = QApplication(sys.argv)
+    #main_window = MainApp()
+    #main_window.show()
+    #sys.exit(app.exec_())
+    main("config_simulation.txt")
 
