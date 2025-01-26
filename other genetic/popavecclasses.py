@@ -105,7 +105,11 @@ class Tree(object):
             elif self.content[i].type == "terminals":
                 return vector_dict[self.content[i].symbol]
         return build_eval()
-            
+    
+    def copy(self, other):
+        self.content = other.content 
+        self.depth = other.depth 
+        self.fitness = other.fitness
     
     def generate_empty(self, depth):
         """Generates an empty tree with a specified depth.
