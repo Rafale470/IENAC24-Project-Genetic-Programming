@@ -81,8 +81,8 @@ def main(config_file):
     #print(f"Fitness : {meilleur_arbre_darwin.fitness}")
 
     # Afficher le graphique
-    #afficher_graphique_both(meilleur_arbre_elit, meilleur_arbre_darwin, fonction_cible, INTERVALLE_MIN.c, INTERVALLE_MAX.c)
-    afficher_graphique(meilleur_arbre_elit=meilleur_arbre_elit, fonction_cible=fonction_cible, intervalle_min=INTERVALLE_MIN.c, intervalle_max=INTERVALLE_MAX.c)
+    #afficher_graphique_both(meilleur_arbre_elit, fonction_cible, INTERVALLE_MIN.c, INTERVALLE_MAX.c, meilleur_arbre_darwin)
+    afficher_graphique(meilleur_arbre_elit, fonction_cible, INTERVALLE_MIN.c, INTERVALLE_MAX.c)
 
 
 def sauvegarder_parametres(self, fichier="./genetique/config_simulation.txt", parametres=None):
@@ -174,7 +174,7 @@ class MainApp(QMainWindow):
         sauvegarder_parametres(self, fichier="config_simulation.txt", parametres=parametres)
         main("config_simulation.txt")
 
-def afficher_graphique(meilleur_arbre_elit, meilleur_arbre_darwin=None, fonction_cible, intervalle_min, intervalle_max):
+def afficher_graphique(meilleur_arbre_elit, fonction_cible, intervalle_min, intervalle_max, meilleur_arbre_darwin=None):
     """
     Affiche le graphique comparant la fonction cible et la fonction trouvée.
     :param meilleur_arbre: L'arbre trouvé par l'algorithme génétique.
