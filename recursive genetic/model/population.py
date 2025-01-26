@@ -68,12 +68,13 @@ class Population:
                 descendant.update_profondeur()
                 # Remplacer le pire individu par le descendant
                 pire_arbre = max(self.population, key=lambda arbre: arbre.fitness(self.fonction_cible, self.points))
-                self.population.remove(pire_arbre)
-                self.population.append(descendant)
-                if random.random() < self.proba_mutation:
-                    descendant.mutation()
-                if random.random() < self.proba_mutation_point:
-                    descendant.point_mutation()
+                if descendant.fitness(self.fonction_cible, self.points) < pire_arbre.fitness(self.fonction_cible, self.points):
+                    self.population.remove(pire_arbre)
+                    self.population.append(descendant)
+                    if random.random() < self.proba_mutation:
+                        descendant.mutation()
+                    if random.random() < self.proba_mutation_point:
+                        descendant.point_mutation()
 
     def effectuer_mutation(self):
         """
@@ -131,7 +132,7 @@ class Population:
         min_fit = []
         mean_fit = []
         worst_fit = []
-        generation = [i+1 for i in range(generations_max)]
+        generations = []
         for generation in range(generations_max):
             # Évaluer la population
             meilleur = self.meilleur_individu()
@@ -146,9 +147,18 @@ class Population:
                 min_fit.append(stat["Fitness Minimale"])
                 mean_fit.append(stat["Fitness Moyenne"])
                 worst_fit.append(stat["Fitness Maximale"])
+                generations.append(generation)
 
             # Critère d'arrêt
             if meilleure_fitness <= fitness_cible:
+                plt.plot(generations, min_fit, label='Fitness Minimale', color='blue')
+                plt.plot(generations, mean_fit, label='Fitness Moyenne', color='green')
+                plt.plot(generations, worst_fit, label='Fitness Maximale', color='red')
+                plt.legend()
+                plt.xlabel('Génération')
+                plt.ylabel('Fitness')
+                plt.title('Évolution de la fitness')
+                plt.show()
                 print("Solution atteinte !")
                 return meilleur
 
@@ -158,9 +168,9 @@ class Population:
             #self.effectuer_mutation_point()
         
         # Afficher l'évolution de la fitness sur un seul et même graphique
-        plt.plot(generation, min_fit, label='Fitness Minimale', color='blue')
-        plt.plot(generation, mean_fit, label='Fitness Moyenne', color='green')
-        plt.plot(generation, worst_fit, label='Fitness Maximale', color='red')
+        plt.plot(generations, min_fit, label='Fitness Minimale', color='blue')
+        plt.plot(generations, mean_fit, label='Fitness Moyenne', color='green')
+        plt.plot(generations, worst_fit, label='Fitness Maximale', color='red')
         plt.legend()
         plt.xlabel('Génération')
         plt.ylabel('Fitness')
