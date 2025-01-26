@@ -220,13 +220,6 @@
       </property>
      </widget>
     </item>
-    <item row="12" column="1">
-     <widget class="QPushButton" name="pushButton_statistiques">
-      <property name="text">
-       <string>Statistiques</string>
-      </property>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar"/>
