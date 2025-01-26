@@ -151,14 +151,14 @@ class Population:
 
             # Critère d'arrêt
             if meilleure_fitness <= fitness_cible:
-                #plt.plot(generations, min_fit, label='Fitness Minimale', color='blue')
-                #plt.plot(generations, mean_fit, label='Fitness Moyenne', color='green')
-                #plt.plot(generations, worst_fit, label='Fitness Maximale', color='red')
-                #plt.legend()
-                #plt.xlabel('Génération')
-                #plt.ylabel('Fitness')
-                #plt.title('Évolution de la fitness')
-                #plt.show()
+                plt.plot(generations, min_fit, label='Fitness Minimale', color='blue')
+                plt.plot(generations, mean_fit, label='Fitness Moyenne', color='green')
+                plt.plot(generations, worst_fit, label='Fitness Maximale', color='red')
+                plt.legend()
+                plt.xlabel('Génération')
+                plt.ylabel('Fitness')
+                plt.title('Évolution de la fitness')
+                plt.show()
                 print("Solution atteinte !")
                 return meilleur
 
@@ -168,14 +168,14 @@ class Population:
             #self.effectuer_mutation_point()
         
         # Afficher l'évolution de la fitness sur un seul et même graphique
-        #plt.plot(generations, min_fit, label='Fitness Minimale', color='blue')
-        #plt.plot(generations, mean_fit, label='Fitness Moyenne', color='green')
-        #plt.plot(generations, worst_fit, label='Fitness Maximale', color='red')
-        #plt.legend()
-        #plt.xlabel('Génération')
-        #plt.ylabel('Fitness')
-        #plt.title('Évolution de la fitness')
-        #plt.show()
+        plt.plot(generations, min_fit, label='Fitness Minimale', color='blue')
+        plt.plot(generations, mean_fit, label='Fitness Moyenne', color='green')
+        plt.plot(generations, worst_fit, label='Fitness Maximale', color='red')
+        plt.legend()
+        plt.xlabel('Génération')
+        plt.ylabel('Fitness')
+        plt.title('Évolution de la fitness')
+        plt.show()
 
         # Si le critère d'arrêt n'est pas atteint
         print("Nombre maximal de générations atteint.")
