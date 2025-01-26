@@ -71,17 +71,18 @@ def main(config_file):
     
     # Lancer l'évolution
     meilleur_arbre_elit = genetic_algorithm(TAILLE_POPULATION.c, GENERATION_MAX.c, PROBA_MUTATION.c, PROBA_CROSSOVER.c, TOURNAMENT_SIZE.c, ELITISM.c, INTERVALLE_MIN.c, INTERVALLE_MAX.c, NOMBRE_POINTS.c, FONCTION_CIBLE.c)
-    meilleur_arbre_darwin = genetic_darwin(TAILLE_POPULATION.c, GENERATION_MAX.c, PROBA_MUTATION.c, PROBA_CROSSOVER.c, PROBA_CROSSOVER_LEAVES.c, INTERVALLE_MIN.c, INTERVALLE_MAX.c, NOMBRE_POINTS.c, FONCTION_CIBLE.c, DARWIN_FACTOR.c)
+    #meilleur_arbre_darwin = genetic_darwin(TAILLE_POPULATION.c, GENERATION_MAX.c, PROBA_MUTATION.c, PROBA_CROSSOVER.c, PROBA_CROSSOVER_LEAVES.c, INTERVALLE_MIN.c, INTERVALLE_MAX.c, NOMBRE_POINTS.c, FONCTION_CIBLE.c, DARWIN_FACTOR.c)
 
     # Afficher les résultats
     print("=== Résultat Final ===")
     print(f"Meilleur individu elitisme : {meilleur_arbre_elit}")
     print(f"Fitness : {meilleur_arbre_elit.fitness}")
-    print(f"Meilleur individu darwin : {meilleur_arbre_darwin}")
-    print(f"Fitness : {meilleur_arbre_darwin.fitness}")
+    #print(f"Meilleur individu darwin : {meilleur_arbre_darwin}")
+    #print(f"Fitness : {meilleur_arbre_darwin.fitness}")
 
     # Afficher le graphique
-    afficher_graphique(meilleur_arbre_elit, meilleur_arbre_darwin, fonction_cible, INTERVALLE_MIN.c, INTERVALLE_MAX.c)
+    #afficher_graphique_both(meilleur_arbre_elit, meilleur_arbre_darwin, fonction_cible, INTERVALLE_MIN.c, INTERVALLE_MAX.c)
+    afficher_graphique(meilleur_arbre_elit=meilleur_arbre_elit, fonction_cible=fonction_cible, intervalle_min=INTERVALLE_MIN.c, intervalle_max=INTERVALLE_MAX.c)
 
 
 def sauvegarder_parametres(self, fichier="./genetique/config_simulation.txt", parametres=None):
@@ -173,7 +174,7 @@ class MainApp(QMainWindow):
         sauvegarder_parametres(self, fichier="config_simulation.txt", parametres=parametres)
         main("config_simulation.txt")
 
-def afficher_graphique(meilleur_arbre_elit, meilleur_arbre_darwin, fonction_cible, intervalle_min, intervalle_max):
+def afficher_graphique(meilleur_arbre_elit, meilleur_arbre_darwin=None, fonction_cible, intervalle_min, intervalle_max):
     """
     Affiche le graphique comparant la fonction cible et la fonction trouvée.
     :param meilleur_arbre: L'arbre trouvé par l'algorithme génétique.
@@ -196,13 +197,15 @@ def afficher_graphique(meilleur_arbre_elit, meilleur_arbre_darwin, fonction_cibl
         return np.array(y_vals)
 
     y_trouvee_elit = evaluer_fonction_trouvee(meilleur_arbre_elit, x_vals)
-    y_trouvee_darwin = evaluer_fonction_trouvee(meilleur_arbre_darwin, x_vals)
+    if meilleur_arbre_darwin != None :
+        y_trouvee_darwin = evaluer_fonction_trouvee(meilleur_arbre_darwin, x_vals)
 
     # Tracer les graphiques
     plt.figure(figsize=(10, 6))
     plt.plot(x_vals, y_cible, label="Fonction cible", color="blue", linewidth=2)
     plt.plot(x_vals, y_trouvee_elit, label="Fonction trouvée elitisme", color="red", linestyle="--", linewidth=2)
-    plt.plot(x_vals, y_trouvee_darwin, label="Fonction trouvée darwin", color="red", linestyle="--", linewidth=2)
+    if meilleur_arbre_darwin != None :
+        plt.plot(x_vals, y_trouvee_darwin, label="Fonction trouvée darwin", color="red", linestyle="--", linewidth=2)
     plt.xlabel("x", fontsize=14)
     plt.ylabel("f(x)", fontsize=14)
     plt.title("Comparaison entre la fonction cible et la fonction trouvée", fontsize=16)
