@@ -2,7 +2,7 @@ import random
 from model.arbre import Arbre
 from fonction import Fonction
 from model.terminal import Terminal
-
+import matplotlib.pyplot as plt
 
 class Population:
     """Classe pour gérer une population d'arbres."""
@@ -128,6 +128,10 @@ class Population:
         :param afficher_stats: Si True, affiche les statistiques à chaque génération.
         :return: Le meilleur individu trouvé.
         """
+        min_fit = []
+        mean_fit = []
+        worst_fit = []
+        generation = [i+1 for i in range(generations_max)]
         for generation in range(generations_max):
             # Évaluer la population
             meilleur = self.meilleur_individu()
@@ -138,7 +142,10 @@ class Population:
                 print(f"Génération {generation + 1} :")
                 print(f"  Meilleure fitness : {meilleure_fitness}")
                 print(f"  Meilleur individu : {meilleur}")
-                self.statistiques_fitness()
+                stat = self.statistiques_fitness()
+                min_fit.append(stat["Fitness Minimale"])
+                mean_fit.append(stat["Fitness Moyenne"])
+                worst_fit.append(stat["Fitness Maximale"])
 
             # Critère d'arrêt
             if meilleure_fitness <= fitness_cible:
@@ -149,6 +156,16 @@ class Population:
             self.effectuer_crossover()
             #self.effectuer_mutation()
             #self.effectuer_mutation_point()
+        
+        # Afficher l'évolution de la fitness sur un seul et même graphique
+        plt.plot(generation, min_fit, label='Fitness Minimale', color='blue')
+        plt.plot(generation, mean_fit, label='Fitness Moyenne', color='green')
+        plt.plot(generation, worst_fit, label='Fitness Maximale', color='red')
+        plt.legend()
+        plt.xlabel('Génération')
+        plt.ylabel('Fitness')
+        plt.title('Évolution de la fitness')
+        plt.show()
 
         # Si le critère d'arrêt n'est pas atteint
         print("Nombre maximal de générations atteint.")
