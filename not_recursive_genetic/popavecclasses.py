@@ -36,9 +36,7 @@ class Tree(object):
     Attributes:
         name (str): The name of the tree.
         content (list): The nodes of the tree.
-        depth (int): The depth of the tree. A tree with one node has a depth of 1
-        gen_seed (int): The seed value used for random number generation.
-        gen (int): The generation of the tree."""
+        depth (int): The depth of the tree. A tree with one node has a depth of 1"""
         
     def __init__ (self, name):
         """Initializes a new Tree instance.
@@ -49,8 +47,7 @@ class Tree(object):
         self.content = []
         self.depth = 0
         self.fitness = 0
-        self.gen_seed = None
-        self.gen = 0
+
     def fitness_calc(self, point_set):
         """Evaluates the fitness of the tree based on a set of points.
         
@@ -120,27 +117,17 @@ class Tree(object):
             self.content.append(None)
         self.depth = depth
     
-    def generate_tree_full(self, depth, seed=None):
+    def generate_tree_full(self, depth):
         """Generates a full tree with all nodes populated.
         
         Parameters:
-            depth (int): The depth of the tree.
-            seed (int, optional): The seed for random number generation. Defaults to None."""
-        if seed == None :
-            self.gen_seed=random.randint(0, SEED_RANGE.c)
-        else :
-            self.gen_seed = seed
-        seed = self.gen_seed
+            depth (int): The depth of the tree."""
         for i in range(2**(depth)-2**(depth-1)-1):
-            random.seed(seed)
             self.content.append(random.choices(MULTI_OPERATORS_LIST.c+SGL_OPERATORS_LIST.c, k=1)[0])
-            seed = random.randint(0, SEED_RANGE.c)
         for i in range(2**(depth-1)):
-            random.seed(seed)
             elt = random.choices(TERMINALS_LIST.c, k=1)[0]
             a = round(random.uniform(-5,5),1)
             self.content.append(fonction(a, str(a),  "cst") if elt.noun == "cst" else elt)
-            seed = random.randint(0, SEED_RANGE.c)
         for i in range(2**(depth)-2**(depth-1)-1):
             
             if self.content[i] == None:
@@ -152,29 +139,19 @@ class Tree(object):
         self.depth = depth
         self.gen = 1
     
-    def generate_tree_growth(self, depth, seed=None):
+    def generate_tree_growth(self, depth):
         """Generates a tree using the growth method, with variable structure.
         
         Parameters:
-            depth (int): The depth of the tree.
-            seed (int, optional): The seed for random number generation. Defaults to None."""
-        if seed == None :
-            self.gen_seed=random.randint(0, SEED_RANGE.c)
-        else :
-            self.gen_seed = seed
-        seed = self.gen_seed
+            depth (int): The depth of the tree."""
         for i in range(2**(depth)-2**(depth-1)-1):
-            random.seed(seed)
             elt = random.choices(MULTI_OPERATORS_LIST.c+SGL_OPERATORS_LIST.c+TERMINALS_LIST.c,  k=1)[0]
             a = round(random.uniform(-5,5),1)
             self.content.append(fonction(a, str(a),  "cst") if elt.noun == "cst" else elt)
-            seed = random.randint(0, SEED_RANGE.c)
         for i in range(2**(depth-1)):
-            random.seed(seed)
             elt = random.choices(TERMINALS_LIST.c,  k=1)[0]
             a = round(random.uniform(-5,5),1)
             self.content.append(fonction(a, str(a), "cst") if elt.noun == "cst" else elt)
-            seed = random.randint(0, SEED_RANGE.c)
         for i in range(2**(depth)-2**(depth-1)-1):
             
             if  self.content[i] == None or self.content[i].type == "terminals" or self.content[i].type == "cst":
@@ -188,17 +165,11 @@ class Tree(object):
         self.gen = 1
         
     
-    def crossover_point(self, seed=None):
+    def crossover_point(self):
         """Selects a crossover point within the tree.
-        
-        Parameters:
-            seed (int, optional): The seed for random number generation. Defaults to None.
             
         Returns:
             int: The index of the crossover point."""
-        if seed == None :
-            seed = random.randint(0, SEED_RANGE.c)
-        random.seed(seed)
         l = []
         n=len(self.content)
         for i in range(1, n) :
@@ -209,29 +180,22 @@ class Tree(object):
         else :
             return(random.choice(l))
         
-    def crossover_func(self, other, seed=None):
+    def crossover_func(self, other):
         """Performs crossover with another tree to produce an offspring tree.
         
         Parameters:
             other (Tree): The other tree to crossover with.
-            seed (int, optional): The seed for random number generation. Defaults to None.
             
         Returns:
             Tree: The resulting offspring tree."""
-        if seed == None :
-            seed = random.randint(0, SEED_RANGE.c)
-        random.seed(seed)
         depth = max(self.depth, other.depth)
-        crossover_point_1_seed = random.randint(0, SEED_RANGE.c)
-        random.seed(crossover_point_1_seed)
-        crossover_point_2_seed = random.randint(0, SEED_RANGE.c)
-        crossover_point_1 = self.crossover_point(crossover_point_1_seed)
-        crossover_point_2 = other.crossover_point(crossover_point_2_seed)
+        crossover_point_1 = self.crossover_point()
+        crossover_point_2 = other.crossover_point()
         
         if crossover_point_1 == 0 and crossover_point_2 == 0:
-            return self.crossover_leaves(other, seed)
+            return self.crossover_leaves(other)
         elif crossover_point_1 == 0 :
-            return other.crossover_func(self, seed)
+            return other.crossover_func(self)
         else :
             offspring = Tree(f"Offspring")
             offspring.generate_empty(depth)
@@ -252,18 +216,14 @@ class Tree(object):
                 index += 1
             return offspring
         
-    def crossover_leaves(self, other, seed=None):
+    def crossover_leaves(self, other):
         """Performs crossover at the leaf nodes with another tree.
         
         Parameters:
             other (Tree): The other tree to crossover with.
-            seed (int, optional): The seed for random number generation. Defaults to None.
             
         Returns:
             Tree: The resulting offspring tree."""
-        if seed == None :
-            seed = random.randint(0, SEED_RANGE.c)
-        random.seed(seed)
         offspring = Tree(f"Offspring")
         offspring.content = self.content                
         offspring.depth = self.depth
@@ -281,17 +241,11 @@ class Tree(object):
         offspring.content[leave_1] = other.content[leave_2]
         return offspring
     
-    def mutation_point(self, seed=None):
+    def mutation_point(self):
         """Selects a mutation point within the tree.
         
-        Parameters:
-            seed (int, optional): The seed for random number generation. Defaults to None.
-            
         Returns:
             int: The index of the mutation point."""
-        if seed == None :
-            seed = random.randint(0, SEED_RANGE.c)
-        random.seed(seed)
         l = []
         for i in range(1, 2**self.depth-1): 
             if self.content[i] is not None and (self.content[i].type == "sgl" or self.content[i].type == "multi"):
@@ -301,16 +255,10 @@ class Tree(object):
         else :
             return random.choices(l)[0]
     
-    def mutation(self, seed=None):
-        """Applies mutation to a subtree within the tree.
-        
-        Parameters:
-            seed (int, optional): The seed for random number generation. Defaults to None."""
-        if seed == None :
-            seed = random.randint(0, SEED_RANGE.c)
-        random.seed(seed)
-        mutation_point_seed = random.randint(0, SEED_RANGE.c)
-        mutation_point_1 = self.mutation_point(mutation_point_seed)
+    def mutation(self):
+        """Applies mutation to a subtree within the tree."""
+
+        mutation_point_1 = self.mutation_point()
         if mutation_point_1 == 0:
             return None
         else :
@@ -319,9 +267,7 @@ class Tree(object):
                 sub_depth += 1
             sub_depth = self.depth-sub_depth+1
             sub_tree = Tree(f"Sub_tree for {self.name} mutation")
-            random.seed(mutation_point_seed)
-            sub_seed = random.randint(0, SEED_RANGE.c)
-            sub_tree.generate_tree_growth(sub_depth, sub_seed)
+            sub_tree.generate_tree_growth(sub_depth)
             l1 = create_list(self, mutation_point_1)
             l2 = create_list(sub_tree, 0)
             index = 0
@@ -337,8 +283,7 @@ class Pop(object):
         name (str): The name of the population.
         content (list): The list of trees in the population.
         gen (int): The generation number.
-        depth (int): The depth of the population's trees.
-        gen_seed (int): The seed value used for random number generation."""
+        depth (int): The depth of the population's trees."""
         
     def __init__(self, name):
         """Initializes a new Pop instance.
@@ -349,7 +294,6 @@ class Pop(object):
         self.content = []
         self.gen = 0
         self.depth = 0
-        self.gen_seed = None
     def evaluate(self, point_set):
         """Evaluates the fitness of each tree in the population.
         
@@ -358,98 +302,33 @@ class Pop(object):
         for tree in self.content :
             tree.fitness_calc(point_set)
 
-    def tournament_selection(self, tournament_size, seed=None):
+    def tournament_selection(self, tournament_size):
         """Selects the best tree from a random sample of trees.
         
         Parameters:
             tournament_size (int): The number of trees to sample.
-            seed (int, optional): The seed for random number generation. Defaults to None.
             
         Returns:
             Tree: The best tree from the sample."""
-        if seed == None :
-            seed = random.randint(0, SEED_RANGE.c)
-        random.seed(seed)
         l = []
         for i in range(tournament_size):
             l.append(random.choice(self.content))
         l.sort(key=lambda x: x.fitness, reverse=False)
         return l[0]
-    def generate(self, n, depth, ratio=0.5, seed=None):
+    def generate(self, n, depth, ratio=0.5):
         """Generates a population of trees.
         
         Parameters:
             n (int): The number of trees in the population.
             depth (int): The depth of the trees.
-            ratio (float): The ratio of full trees to growth trees. Defaults to 0.5.
-            seed (int, optional): The seed for random number generation. Defaults to None."""
-        if seed == None :
-            self.gen_seed=random.randint(0, SEED_RANGE.c)
-        else :
-            self.gen_seed = seed
-        seed = self.gen_seed
+            ratio (float): The ratio of full trees to growth trees. Defaults to 0.5."""
         for i in range(int(n*ratio)):
-            random.seed(seed)
             tree = Tree(f"Tree number {i+1}")
-            tree.generate_tree_full(depth, seed)
+            tree.generate_tree_full(depth)
             self.content.append(tree)
-            seed = random.randint(0, SEED_RANGE.c)
         for i in range(int(n-n*ratio)):
-            random.seed(seed)
             tree = Tree(f"Tree number {int(n*ratio)+i+1}")
-            tree.generate_tree_growth(depth, seed)
+            tree.generate_tree_growth(depth)
             self.content.append(tree)
-            seed = random.randint(0, SEED_RANGE.c)
         self.depth = depth
         self.gen = 1
-
-
-if __name__ == "__main__":
-    print("---------------------------")
-    seed = random.randint(0,SEED_RANGE.c)
-    print(seed)
-    test = Tree("test")
-    test.generate_tree_full(5, seed)
-    print(test)
-    test2 = Tree("test3")
-    test2.generate_tree_growth(5, seed)
-    print(test2)
-    print("---------------------------")
-    seed = random.randint(0,SEED_RANGE.c)
-    print(seed)
-    final_test = Pop("final_test")
-    final_test.generate(10, 5, 0.5, seed)
-    print(final_test.content)
-    print("---------------------------")
-    test3 = test2.crossover_func(test)
-    print(test3)
-    test4 = test2.crossover_leaves(test)
-    print(test4)
-    print("---------------------------")
-    print(test)
-    seed = random.randint(0,SEED_RANGE.c)
-    print(seed)
-    test.mutation(seed)
-    print(test)
-    print("---------------------------")
-    print(test.gen_seed, test)
-    print(test.evaluate({"x":0, "y":2}))
-    print(test.evaluate({"x":1, "y":2}))
-    print("---------------------------")
-    pop = Pop("test")
-    pop.generate(1000, 5, 0.5, 8941)
-    print(pop.gen_seed)
-    def error(tree):
-        n = len(tree.content)-2**(tree.depth-1)
-        for i in range(n):
-            if tree.content[i] == None and (tree.content[2*i+1] != None or tree.content[2*i+2] != None):
-                return True
-        return False
-    for i in range(999):
-        offspring = pop.content[i].crossover_func(pop.content[i+1])
-        if error(offspring):
-            print(True)
-    for i in range(999):
-        pop.content[i].mutation()
-        if error(pop.content[i]):
-            print(True, i)
