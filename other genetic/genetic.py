@@ -2,7 +2,7 @@ from constantes import *
 import operator
 import random
 import numpy as np
-from popavecclasses import Pop
+from popavecclasses import Pop, Tree
 
 def genetic_algorithm(pop_size, nb_gen, mutation_rate, crossover_rate, tournament_size, elitism, intervalle_min, intervalle_max, nombre_points, fonction_cible):
     #Initialisation de la population
@@ -47,3 +47,35 @@ def genetic_algorithm(pop_size, nb_gen, mutation_rate, crossover_rate, tournamen
     #Retourne le meilleur individu
     return sorted(population.content, key=(lambda x : x.fitness))[0]
 
+
+def genetic_darwin (pop_size, nb_gen, mutation_rate, crossover_rate, crossover_leaves_rate, intervalle_min, intervalle_max, nombre_points, fonction_cible, darwin_factor):
+    a = np.linspace(intervalle_min, intervalle_max, nombre_points)
+    y = [(x, eval(fonction_cible)) for x in a]
+    population = Pop("population")
+    population.generate(pop_size, PROFONDEUR_MAX.c, RATIO_FULL_TREES.c)
+    darwin_number = int(pop_size*darwin_factor)
+    for i in range(nb_gen):
+        population.evaluate(y)
+        new_pop_content = sorted(population.content, key=(lambda x :x.fitness))[:darwin_number]
+        for j in range(pop_size-darwin_number):
+            tirage = random.choices([1,2], weights=[mutation_rate, crossover_rate])[0]
+            if tirage == 1 :
+                mutant = Tree("Mutant")
+                origin = random.choice(new_pop_content)
+                mutant.copy(origin)
+                mutant.mutation()
+                new_pop_content.append(mutant)
+            else :
+                father = random.choice(new_pop_content)
+                mother = random.choice(new_pop_content)
+                if random.random() > crossover_leaves_rate :
+                    offspring = father.crossover_func(mother)
+                    offspring.fitness_calc(y)
+                    new_pop_content.append(offspring)
+                else :
+                    offspring = father.crossover_leaves(mother)
+                    offspring.fitness_calc(y)
+                    new_pop_content.append(offspring)
+        population.content = new_pop_content
+        population.gen += 1
+    return sorted(population.content, key=(lambda x : x.fitness))[0]
