@@ -1,9 +1,12 @@
+# The class `Noeud` represents a node with a depth attribute and a method to update the depth.
 class Noeud:
     def __init__(self, profondeur=0):
         self.profondeur = profondeur
     def update_profondeur(self, profondeur):
         pass
 
+# This class represents an external node in a tree structure with a terminal value and methods for
+# evaluation and updating depth.
 class NoeudExterne(Noeud):
     def __init__(self, terminal, profondeur=0):
         super().__init__(profondeur)
@@ -15,6 +18,8 @@ class NoeudExterne(Noeud):
     def __repr__(self):
         return repr(self.terminal)
 
+# The class `NoeudInterne` represents an internal node in a tree structure with a function, children
+# nodes, and methods for evaluation and updating depth.
 class NoeudInterne(Noeud):
     def __init__(self, fonction, enfants, profondeur=0): #un enfant est soit un terminal soit une fonction sous la forme d'une listen donc soit un noeud interne ou externe
         super().__init__(profondeur)

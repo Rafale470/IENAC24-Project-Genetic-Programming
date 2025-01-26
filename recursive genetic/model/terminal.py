@@ -1,3 +1,5 @@
+# The `Terminal` class represents a terminal node in a mathematical expression tree that can evaluate
+# its value based on input variables.
 class Terminal:
     def __init__(self, valeur):
         self.valeur = valeur

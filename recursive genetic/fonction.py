@@ -1,3 +1,5 @@
+# The class `Fonction` represents a function with a name, number of arguments, and the function
+# itself, allowing for application of the function to a list of arguments.
 class Fonction:
     def __init__(self, nom, argument, fonction):
         self.nom = nom

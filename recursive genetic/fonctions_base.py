@@ -1,3 +1,5 @@
+# This code snippet is defining several mathematical functions and creating instances of a custom
+# `Fonction` class for each function.
 import math
 from fonction import Fonction
 
