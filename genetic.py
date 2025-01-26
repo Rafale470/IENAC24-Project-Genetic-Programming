@@ -1,5 +1,5 @@
 #Algorithme évolutioniste (boucle principale) pour la population décrite dans populaiton.py
-#Auteurs: Mathias ROBERT 
+
 import operator
 import random
 import numpy as np
@@ -27,12 +27,10 @@ def genetic_algorithm(pop_size, nb_gen, mutation_rate, crossover_rate, tournamen
             children = parent1.crossover_func(parent2)
             if children == None:
                 continue
-            #if random.random() < mutation_rate:
-                #children.mutation()
+            if random.random() < mutation_rate:
+                children.mutation()
             #Ajout des enfants à la nouvelle population
             new_pop_content.append(children)
-        #Mutation
-        #population.mutate(children, mutation_rate)
         #Elitisme
         new_pop_content += sorted(population.content, key=(lambda x :x.fitness))[:elitism]
 
