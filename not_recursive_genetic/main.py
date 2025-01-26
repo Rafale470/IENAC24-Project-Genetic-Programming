@@ -1,4 +1,5 @@
 import sys
+#import os
 import numpy as np
 from PyQt5.QtWidgets import QMainWindow
 from interface import Ui_MainWindow  # Généré à partir du fichier .ui
@@ -85,7 +86,7 @@ def main(config_file):
     afficher_graphique(meilleur_arbre_elit, fonction_cible, INTERVALLE_MIN.c, INTERVALLE_MAX.c)
 
 
-def sauvegarder_parametres(self, fichier="./genetique/config_simulation.txt", parametres=None):
+def sauvegarder_parametres(self, fichier="config_simulation.txt", parametres=None):
     """
     Sauvegarde les paramètres de la simulation dans un fichier texte.
     :param fichier: Nom du fichier où écrire les paramètres (par défaut "config_simulation.txt").
@@ -220,4 +221,5 @@ if __name__ == "__main__":
     main_window = MainApp()
     main_window.show()
     sys.exit(app.exec_())
+    #main(f"{os.path.dirname(os.path.abspath(__file__))}/config_simulation.txt")
 
