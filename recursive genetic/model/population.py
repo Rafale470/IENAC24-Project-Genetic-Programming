@@ -68,13 +68,15 @@ class Population:
                 descendant.update_profondeur()
                 # Remplacer le pire individu par le descendant
                 pire_arbre = max(self.population, key=lambda arbre: arbre.fitness(self.fonction_cible, self.points))
+                if random.random() < self.proba_mutation:
+                        descendant.mutation()
+                if random.random() < self.proba_mutation_point:
+                        descendant.point_mutation()
+                descendant.update_profondeur()
                 if descendant.fitness(self.fonction_cible, self.points) < pire_arbre.fitness(self.fonction_cible, self.points):
                     self.population.remove(pire_arbre)
                     self.population.append(descendant)
-                    if random.random() < self.proba_mutation:
-                        descendant.mutation()
-                    if random.random() < self.proba_mutation_point:
-                        descendant.point_mutation()
+                    
 
     def effectuer_mutation(self):
         """
