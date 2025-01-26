@@ -80,10 +80,10 @@ def main(config_file):
     print(f"Fitness : {meilleur_arbre.fitness(fonction_cible, points)}")
 
     # Afficher le graphique
-    #afficher_graphique(meilleur_arbre, fonction_cible, intervalle_min, intervalle_max)
+    afficher_graphique(meilleur_arbre, fonction_cible, intervalle_min, intervalle_max)
 
 
-def sauvegarder_parametres(self, fichier="./genetique/config_simulation.txt", parametres=None):
+def sauvegarder_parametres(self, fichier="config_simulation.txt", parametres=None):
     """
     Sauvegarde les paramètres de la simulation dans un fichier texte.
     :param fichier: Nom du fichier où écrire les paramètres (par défaut "config_simulation.txt").
@@ -214,3 +214,4 @@ if __name__ == "__main__":
     main_window = MainApp()
     main_window.show()
     sys.exit(app.exec_())
+    #main("config_simulation.txt")
