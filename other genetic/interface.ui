@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>994</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QFormLayout" name="formLayout">
+    <!-- Existing parameters -->
+    <item row="0" column="0">
+     <widget class="QLabel" name="label_fonction_cible">
+      <property name="text">
+       <string>Fonction cible</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLineEdit" name="lineEdit_fonction_cible"/>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_intervalle_points">
+      <property name="text">
+       <string>Intervalle des points</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <layout class="QHBoxLayout" name="intervalle_points_layout">
+      <item>
+       <widget class="QLineEdit" name="lineEdit_intervalle_min">
+        <property name="placeholderText">
+         <string>Borne inf</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit_intervalle_max">
+        <property name="placeholderText">
+         <string>Borne sup</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <!-- Functions Selection -->
+    <item row="2" column="0" colspan="2">
+     <widget class="QGroupBox" name="groupBox_fonctions">
+      <property name="title">
+       <string>Fonctions disponibles</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_fonctions">
+       <item>
+        <widget class="QCheckBox" name="checkBox_addition">
+         <property name="text">
+          <string>Addition (+)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_soustraction">
+         <property name="text">
+          <string>Soustraction (-)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_multiplication">
+         <property name="text">
+          <string>Multiplication (*)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_division">
+         <property name="text">
+          <string>Division (/)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_puissance">
+         <property name="text">
+          <string>Puissance (^)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_cosinus">
+         <property name="text">
+          <string>Cosinus (cos)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_sinus">
+         <property name="text">
+          <string>Sinus (sin)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_exponentielle">
+         <property name="text">
+          <string>Exponentielle (exp)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_logarithme">
+         <property name="text">
+          <string>Logarithme (log)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_valeur_absolue">
+         <property name="text">
+          <string>Valeur absolue (abs)</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <!-- Remaining parameters -->
+    <item row="3" column="0">
+     <widget class="QLabel" name="label_nombre_points">
+      <property name="text">
+       <string>Nombre de points</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QLineEdit" name="lineEdit_nombre_points"/>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="label_taille_population">
+      <property name="text">
+       <string>Taille de la population</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QLineEdit" name="lineEdit_taille_population"/>
+    </item>
+    <item row="5" column="0">
+     <widget class="QLabel" name="label_profondeur_max">
+      <property name="text">
+       <string>Profondeur max des arbres</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QLineEdit" name="lineEdit_profondeur_max"/>
+    </item>
+    <item row="7" column="0">
+     <widget class="QLabel" name="label_proba_crossover">
+      <property name="text">
+       <string>Probabilité de crossover</string>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="1">
+     <widget class="QLineEdit" name="lineEdit_proba_crossover"/>
+    </item>
+    <item row="8" column="0">
+     <widget class="QLabel" name="label_proba_mutation">
+      <property name="text">
+       <string>Probabilité de mutation</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="1">
+     <widget class="QLineEdit" name="lineEdit_proba_mutation"/>
+    </item>
+    <item row="9" column="0">
+     <widget class="QLabel" name="label_proba_mutation_point">
+      <property name="text">
+       <string>Probabilité de mutation point</string>
+      </property>
+     </widget>
+    </item>
+    <item row="9" column="1">
+     <widget class="QLineEdit" name="lineEdit_proba_mutation_point"/>
+    </item>
+    <item row="10" column="0">
+     <widget class="QLabel" name="label_generations_max">
+      <property name="text">
+       <string>Générations max</string>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="1">
+     <widget class="QLineEdit" name="lineEdit_generations_max"/>
+    </item>
+    <item row="11" column="0">
+     <widget class="QLabel" name="label_fitness_cible">
+      <property name="text">
+       <string>Fitness cible</string>
+      </property>
+     </widget>
+    </item>
+    <item row="11" column="1">
+     <widget class="QLineEdit" name="lineEdit_fitness_cible"/>
+    </item>
+    <!-- Buttons -->
+    <item row="12" column="0">
+     <widget class="QPushButton" name="pushButton_lancer_simulation">
+      <property name="text">
+       <string>Lancer la simulation</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar"/>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
